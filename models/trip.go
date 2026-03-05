@@ -116,7 +116,7 @@ func (s *TripsService) CreateTrip(t TripInput) (int64, error) {
 			start_date,
 			end_date,
 			trip_type,
-			need_visa,
+			need_visa
 		)
 		VALUES (?, ?, ?, ?, ?, ?)
 		RETURNING id

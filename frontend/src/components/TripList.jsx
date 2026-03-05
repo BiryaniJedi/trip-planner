@@ -10,7 +10,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GetAllTrips, DeleteTripById } from '../../wailsjs/go/main/App';
-import { TYPE_LABELS } from '../utils';
+import { TYPE_LABELS, toTitleCase } from '../utils';
 
 export default function TripList() {
 	// TODO: state for trips array and a loading boolean
@@ -26,23 +26,15 @@ export default function TripList() {
 			.then((data) => {
 				const result = data ?? [];
 				setTrips(result);
-				console.log(`Trips: ${result.length === 0 ? 'no trips' : result}`);
 				setError('');
 			})
 			.catch((err) => setError(err))
 			.finally(() => setLoading(false));
 	};
 
-	// TODO: useEffect — load all trips on mount, set loading false when done
 	useEffect(() => {
 		loadTrips();
-		console.log('LOG SOMETHING!!!');
 	}, []);
-
-	// TODO: handleDelete(id)
-	//   - confirm with the user before deleting
-	//   - call DeleteTrip(id)
-	//   - remove the deleted trip from local state (no need to re-fetch)
 
 	const handleDelete = async (id) => {
 		setLoading(true);
@@ -54,13 +46,6 @@ export default function TripList() {
 
 		loadTrips();
 	};
-
-	// TODO: render
-	//   - while loading: show a loading message
-	//   - heading + "New Trip" button
-	//   - empty state message if trips.length === 0
-	//   - list of trip cards with name, destination, type label, Edit + Delete buttons
-	//
 
 	if (error.length !== 0) {
 		return (
@@ -84,23 +69,26 @@ export default function TripList() {
 			<button onClick={() => navigate('/')}>Back to Home</button>
 			<button onClick={() => navigate('/trips/new')}>Create New Trip</button>
 			{trips.length === 0 && <h1>No trips yet, click the button above to create one!</h1>}
-			<ul>
-				{trips.map((trip) => (
-					<div key={trip.id}>
-						<li>
-							{trip.name}, {trip.destination}, {trip.start_date}, {trip.end_date}
-						</li>
-						<button onClick={() => setConfirmId(trip.id)}>Delete Trip</button>
-						{confirmId === trip.id && (
-							<div className="modal">
-								<p>Are you sure you want to delete this trip? This cannot be undone.</p>
-								<button onClick={() => handleDelete(trip.id)}>Yes, Delete</button>
-								<button onClick={() => setShowConfirm(false)}>Cancel</button>
-							</div>
-						)}
-					</div>
-				))}
-			</ul>
+			{trips.map((trip, index) => (
+				<div key={trip.id}>
+					<h1>Trip {index + 1}</h1>
+					<h2>{toTitleCase(trip.name)}</h2>
+					<h3>{toTitleCase(trip.destination)}</h3>
+					<h3>{TYPE_LABELS[trip.trip_type]}</h3>
+					{trip.need_visa && <h3>Need visa!</h3>}
+					<p>
+						{trip.start_date} to {trip.end_date}
+					</p>
+					<button onClick={() => setConfirmId(trip.id)}>Delete Trip</button>
+					{confirmId === trip.id && (
+						<div className="modal">
+							<p>Are you sure you want to delete this trip? This cannot be undone.</p>
+							<button onClick={() => handleDelete(trip.id)}>Yes, Delete</button>
+							<button onClick={() => setShowConfirm(false)}>Cancel</button>
+						</div>
+					)}
+				</div>
+			))}
 		</div>
 	);
 }
