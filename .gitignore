@@ -27,3 +27,5 @@ tmp/
 .vscode/
 *.swp
 *.swo
+
+build/
