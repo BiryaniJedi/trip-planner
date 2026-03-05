@@ -1,0 +1,29 @@
+# Binary output
+trip-planner
+tmp/
+
+# Database (local data, don't commit)
+*.db
+*.db-shm
+*.db-wal
+
+# Build artifacts
+*.exe
+*.test
+*.out
+
+# Air
+tmp/
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+.env.local
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
