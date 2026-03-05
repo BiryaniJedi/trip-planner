@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS trips (
     destination TEXT NOT NULL,
     start_date  TEXT,
     end_date    TEXT,
-    trip_type   TEXT NOT NULL DEFAULT 'travel'
+    trip_type   TEXT NOT NULL DEFAULT 'travel' CHECK(trip_type IN ('travel', 'festival', 'roadtrip', 'other')),
+    need_visa   BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS expenses (
