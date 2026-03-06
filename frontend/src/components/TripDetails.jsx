@@ -17,6 +17,7 @@ import {
 	UpdateLinkById,
 	DeleteLinkById,
 	GetExpensesByTripId,
+	GetItinerariesByTripId,
 } from '../../wailsjs/go/main/App';
 import { BrowserOpenURL } from '../../wailsjs/runtime/runtime';
 import { TYPE_LABELS, formatDate, tripDuration, formatCents } from '../utils';
@@ -123,6 +124,9 @@ export default function TripDetails() {
 	// Expenses summary
 	const [expenses, setExpenses] = useState([]);
 
+	// Itinerary preview
+	const [itinerary, setItinerary] = useState([]);
+
 	// ── Load ──────────────────────────────────────────────────────────────────
 
 	useEffect(() => {
@@ -133,12 +137,13 @@ export default function TripDetails() {
 		setLoading(true);
 		setError(null);
 		try {
-			const [tripData, photosData, notesData, linksData, expensesData] = await Promise.all([
+			const [tripData, photosData, notesData, linksData, expensesData, itineraryData] = await Promise.all([
 				GetTripByID(tripId),
 				GetPhotosByTripId(tripId),
 				GetNotesByTripId(tripId),
 				GetLinksByTripId(tripId),
 				GetExpensesByTripId(tripId),
+				GetItinerariesByTripId(tripId),
 			]);
 			setTrip(tripData);
 			const photoList = photosData ?? [];
@@ -148,6 +153,7 @@ export default function TripDetails() {
 			setNotes(noteList);
 			setLinks(linkList);
 			setExpenses(expensesData ?? []);
+			setItinerary(itineraryData ?? []);
 
 			if (photoList.length > 0) {
 				loadPhotoURLs(photoList);
@@ -730,7 +736,40 @@ export default function TripDetails() {
 					</div>
 				</div>
 
-				{/* ── Expenses summary ── */}
+				{/* ── Itinerary preview ── */}
+			<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+				<div className="flex items-center justify-between mb-4">
+					<h2 className="text-base font-semibold text-slate-700">Itinerary</h2>
+					<button onClick={() => navigate(`/trips/${tripId}/itinerary`)} className={btnSecondary}>
+						{itinerary.length === 0 ? '+ Plan Itinerary' : 'Full View →'}
+					</button>
+				</div>
+
+				{itinerary.length === 0 ? (
+					<EmptyMsg>No itinerary yet. Plan your days!</EmptyMsg>
+				) : (
+					<div className="flex flex-col divide-y divide-slate-100 max-h-56 overflow-y-auto">
+						{itinerary.map((event) => {
+							const d = new Date(event.date + 'T00:00:00');
+							const shortDate = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+							return (
+								<div key={event.id} className="flex items-baseline gap-3 py-2.5 pr-1">
+									<span className="text-xs text-slate-400 shrink-0 w-28">{shortDate}</span>
+									<span className="text-xs font-mono text-[var(--c-p6)] shrink-0 w-12">{event.time}</span>
+									<div className="min-w-0">
+										<p className="text-sm text-slate-700 font-medium truncate">{event.title}</p>
+										{event.description && (
+											<p className="text-xs text-slate-400 truncate">{event.description}</p>
+										)}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
+			</div>
+
+			{/* ── Expenses summary ── */}
 				<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
 					<div className="flex items-center justify-between mb-4">
 						<h2 className="text-base font-semibold text-slate-700">Expenses</h2>

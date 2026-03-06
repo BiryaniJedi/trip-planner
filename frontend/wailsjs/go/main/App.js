@@ -10,6 +10,10 @@ export function CreateExpenseByTripId(arg1, arg2) {
   return window['go']['main']['App']['CreateExpenseByTripId'](arg1, arg2);
 }
 
+export function CreateItineraryByTripId(arg1, arg2) {
+  return window['go']['main']['App']['CreateItineraryByTripId'](arg1, arg2);
+}
+
 export function CreateLinkByTripId(arg1, arg2) {
   return window['go']['main']['App']['CreateLinkByTripId'](arg1, arg2);
 }
@@ -28,6 +32,10 @@ export function DeleteAllPhotosByTripId(arg1) {
 
 export function DeleteExpenseById(arg1) {
   return window['go']['main']['App']['DeleteExpenseById'](arg1);
+}
+
+export function DeleteItineraryById(arg1) {
+  return window['go']['main']['App']['DeleteItineraryById'](arg1);
 }
 
 export function DeleteLinkById(arg1) {
@@ -56,6 +64,14 @@ export function GetExpenseById(arg1) {
 
 export function GetExpensesByTripId(arg1) {
   return window['go']['main']['App']['GetExpensesByTripId'](arg1);
+}
+
+export function GetItinerariesByTripId(arg1) {
+  return window['go']['main']['App']['GetItinerariesByTripId'](arg1);
+}
+
+export function GetItineraryById(arg1) {
+  return window['go']['main']['App']['GetItineraryById'](arg1);
 }
 
 export function GetLinkById(arg1) {
@@ -104,6 +120,10 @@ export function UpdateCaptionByPhotoId(arg1, arg2) {
 
 export function UpdateExpenseById(arg1, arg2) {
   return window['go']['main']['App']['UpdateExpenseById'](arg1, arg2);
+}
+
+export function UpdateItineraryById(arg1, arg2) {
+  return window['go']['main']['App']['UpdateItineraryById'](arg1, arg2);
 }
 
 export function UpdateLinkById(arg1, arg2) {

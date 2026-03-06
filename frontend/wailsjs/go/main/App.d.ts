@@ -6,6 +6,8 @@ export function AddPhoto(arg1:number,arg2:string,arg3:string):Promise<number>;
 
 export function CreateExpenseByTripId(arg1:number,arg2:models.ExpenseInput):Promise<number>;
 
+export function CreateItineraryByTripId(arg1:number,arg2:models.ItineraryInput):Promise<number>;
+
 export function CreateLinkByTripId(arg1:number,arg2:models.LinkInput):Promise<number>;
 
 export function CreateNoteByTripId(arg1:number,arg2:models.NoteInput):Promise<number>;
@@ -15,6 +17,8 @@ export function CreateTrip(arg1:models.TripInput):Promise<number>;
 export function DeleteAllPhotosByTripId(arg1:number):Promise<void>;
 
 export function DeleteExpenseById(arg1:number):Promise<void>;
+
+export function DeleteItineraryById(arg1:number):Promise<void>;
 
 export function DeleteLinkById(arg1:number):Promise<void>;
 
@@ -29,6 +33,10 @@ export function GetAllTrips():Promise<Array<models.Trip>>;
 export function GetExpenseById(arg1:number):Promise<models.Expense>;
 
 export function GetExpensesByTripId(arg1:number):Promise<Array<models.Expense>>;
+
+export function GetItinerariesByTripId(arg1:number):Promise<Array<models.Itinerary>>;
+
+export function GetItineraryById(arg1:number):Promise<models.Itinerary>;
 
 export function GetLinkById(arg1:number):Promise<models.Link>;
 
@@ -53,6 +61,8 @@ export function Ping():Promise<string>;
 export function UpdateCaptionByPhotoId(arg1:number,arg2:string):Promise<void>;
 
 export function UpdateExpenseById(arg1:number,arg2:models.ExpenseInput):Promise<void>;
+
+export function UpdateItineraryById(arg1:number,arg2:models.ItineraryInput):Promise<void>;
 
 export function UpdateLinkById(arg1:number,arg2:models.LinkInput):Promise<void>;
 

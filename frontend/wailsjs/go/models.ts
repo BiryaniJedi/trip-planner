@@ -44,6 +44,46 @@ export namespace models {
 	        this.note = source["note"];
 	    }
 	}
+	export class Itinerary {
+	    id: number;
+	    trip_id: number;
+	    date: string;
+	    time: string;
+	    title: string;
+	    description: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Itinerary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.trip_id = source["trip_id"];
+	        this.date = source["date"];
+	        this.time = source["time"];
+	        this.title = source["title"];
+	        this.description = source["description"];
+	    }
+	}
+	export class ItineraryInput {
+	    date: string;
+	    time: string;
+	    title: string;
+	    description: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ItineraryInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.time = source["time"];
+	        this.title = source["title"];
+	        this.description = source["description"];
+	    }
+	}
 	export class Link {
 	    id: number;
 	    trip_id: number;

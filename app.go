@@ -15,21 +15,23 @@ import (
 )
 
 type App struct {
-	ctx             context.Context
-	tripsService    *models.TripsService
-	expensesService *models.ExpensesService
-	notesService    *models.NotesService
-	linksService    *models.LinksService
-	photosService   *models.PhotosService
+	ctx                context.Context
+	tripsService       *models.TripsService
+	expensesService    *models.ExpensesService
+	notesService       *models.NotesService
+	linksService       *models.LinksService
+	photosService      *models.PhotosService
+	itinerariesService *models.ItinerariesService
 }
 
 func NewApp(db *sql.DB, photoDir string) *App {
 	return &App{
-		tripsService:    models.NewTripsService(db),
-		expensesService: models.NewExpensesService(db),
-		notesService:    models.NewNotesService(db),
-		linksService:    models.NewLinksService(db),
-		photosService:   models.NewPhotosService(db, photoDir),
+		tripsService:       models.NewTripsService(db),
+		expensesService:    models.NewExpensesService(db),
+		notesService:       models.NewNotesService(db),
+		linksService:       models.NewLinksService(db),
+		photosService:      models.NewPhotosService(db, photoDir),
+		itinerariesService: models.NewItinerariesService(db),
 	}
 }
 
@@ -200,4 +202,26 @@ func (a *App) GetPhotoBase64(photoId int64) (string, error) {
 		mime = "image/heic"
 	}
 	return "data:" + mime + ";base64," + base64.StdEncoding.EncodeToString(data), nil
+}
+
+// ── Itineraries ────────────────────────────────────────────────────────────
+
+func (a *App) GetItinerariesByTripId(tripId int64) ([]models.Itinerary, error) {
+	return a.itinerariesService.GetItinerariesByTripId(tripId)
+}
+
+func (a *App) GetItineraryById(itineraryId int64) (models.Itinerary, error) {
+	return a.itinerariesService.GetItineraryById(itineraryId)
+}
+
+func (a *App) CreateItineraryByTripId(tripId int64, input models.ItineraryInput) (int64, error) {
+	return a.itinerariesService.CreateItineraryByTripId(tripId, input)
+}
+
+func (a *App) UpdateItineraryById(itineraryId int64, input models.ItineraryInput) error {
+	return a.itinerariesService.UpdateItineraryById(itineraryId, input)
+}
+
+func (a *App) DeleteItineraryById(itineraryId int64) error {
+	return a.itinerariesService.DeleteItineraryById(itineraryId)
 }
