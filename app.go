@@ -3,6 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/BiryaniJedi/trip-planner/models"
 )
@@ -151,4 +158,46 @@ func (a *App) DeletePhotoById(photoId int64) error {
 
 func (a *App) DeleteAllPhotosByTripId(tripId int64) error {
 	return a.photosService.DeleteAllPhotosByTripId(tripId)
+}
+
+// PickPhotoFile opens a native file picker and returns the selected path.
+// Returns an empty string if the user cancels.
+func (a *App) PickPhotoFile() (string, error) {
+	path, err := wailsruntime.OpenFileDialog(a.ctx, wailsruntime.OpenDialogOptions{
+		Title: "Select Photo",
+		Filters: []wailsruntime.FileFilter{
+			{DisplayName: "Images (*.jpg, *.jpeg, *.png, *.gif, *.webp, *.heic)", Pattern: "*.jpg;*.jpeg;*.png;*.gif;*.webp;*.heic"},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	return path, nil
+}
+
+// GetPhotoBase64 reads a stored photo from disk and returns it as a base64 data URL
+// suitable for use directly in an <img src="..."> element.
+func (a *App) GetPhotoBase64(photoId int64) (string, error) {
+	photo, err := a.photosService.GetPhotoById(photoId)
+	if err != nil {
+		return "", err
+	}
+	diskPath := a.photosService.PhotoPath(photo.TripID, photo.Filename)
+	data, err := os.ReadFile(diskPath)
+	if err != nil {
+		return "", fmt.Errorf("reading photo file: %w", err)
+	}
+	ext := strings.ToLower(filepath.Ext(diskPath))
+	mime := "image/jpeg"
+	switch ext {
+	case ".png":
+		mime = "image/png"
+	case ".gif":
+		mime = "image/gif"
+	case ".webp":
+		mime = "image/webp"
+	case ".heic":
+		mime = "image/heic"
+	}
+	return "data:" + mime + ";base64," + base64.StdEncoding.EncodeToString(data), nil
 }

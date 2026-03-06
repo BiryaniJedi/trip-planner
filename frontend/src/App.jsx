@@ -4,6 +4,7 @@ import Home from './components/Home';
 import TripList from './components/TripList';
 import TripDetails from './components/TripDetails';
 import TripForm from './components/TripForm';
+import Expenses from './components/Expenses';
 
 function App() {
 	return (
@@ -17,6 +18,7 @@ function App() {
 						<Route path="/trips/new" element={<TripForm />} />
 						<Route path="/trips/:id" element={<TripDetails />} />
 						<Route path="/trips/:id/edit" element={<TripForm />} />
+						<Route path="/trips/:id/expenses" element={<Expenses />} />
 					</Routes>
 				</main>
 			</div>

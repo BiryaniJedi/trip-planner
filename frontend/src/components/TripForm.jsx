@@ -1,10 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CreateTrip } from '../../wailsjs/go/main/App';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CreateTrip, GetTripByID, UpdateTripById } from '../../wailsjs/go/main/App';
 import { TYPE_LABELS } from '../utils';
 
 export default function TripForm() {
+	const { id } = useParams();
+	const tripId = id ? parseInt(id) : null;
+	const isEdit = tripId !== null;
+
 	const [loading, setLoading] = useState(false);
+	const [initLoading, setInitLoading] = useState(isEdit);
 	const [error, setError] = useState('');
 	const [name, setName] = useState('');
 	const [dest, setDest] = useState('');
@@ -15,14 +20,20 @@ export default function TripForm() {
 
 	const navigate = useNavigate();
 
-	const resetStates = () => {
-		setName('');
-		setDest('');
-		setStart('');
-		setEnd('');
-		setTripType('travel');
-		setNeedVisa(false);
-	};
+	useEffect(() => {
+		if (!isEdit) return;
+		GetTripByID(tripId)
+			.then((trip) => {
+				setName(trip.name);
+				setDest(trip.destination);
+				setStart(trip.start_date);
+				setEnd(trip.end_date);
+				setTripType(trip.trip_type);
+				setNeedVisa(trip.need_visa);
+			})
+			.catch((err) => setError(String(err)))
+			.finally(() => setInitLoading(false));
+	}, [tripId]);
 
 	const handleSubmit = async () => {
 		setError('');
@@ -35,32 +46,45 @@ export default function TripForm() {
 			return;
 		}
 		setLoading(true);
-		await CreateTrip({
-			name: name,
+		const input = {
+			name,
 			destination: dest,
 			start_date: start,
 			end_date: end,
 			trip_type: tripType,
 			need_visa: needVisa,
-		})
-			.then(() => {
-				resetStates();
-				navigate('/trips'); //replace with trips/${returnedId} after implementing TripDetail
-			})
-			.catch((err) => {
-				setError(err);
-			})
-			.finally(() => setLoading(false));
+		};
+		try {
+			if (isEdit) {
+				await UpdateTripById(tripId, input);
+				navigate(`/trips/${tripId}`);
+			} else {
+				const newId = await CreateTrip(input);
+				navigate(`/trips/${newId}`);
+			}
+		} catch (err) {
+			setError(String(err));
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const labelClass = 'block text-sm font-medium text-slate-600 mb-1';
 	const inputClass =
 		'w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition';
 
+	if (initLoading) {
+		return (
+			<div className="h-full flex items-center justify-center">
+				<p className="text-slate-400 text-lg">Loading…</p>
+			</div>
+		);
+	}
+
 	return (
 		<div className="min-h-full bg-slate-50 flex items-start justify-center px-6 py-12">
 			<div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-				<h1 className="text-2xl font-bold text-slate-800 mb-6">New Trip</h1>
+				<h1 className="text-2xl font-bold text-slate-800 mb-6">{isEdit ? 'Edit Trip' : 'New Trip'}</h1>
 
 				{error && (
 					<div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
@@ -72,26 +96,22 @@ export default function TripForm() {
 					<div>
 						<label className={labelClass}>Name</label>
 						<input
-							id="name"
 							type="text"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							className={inputClass}
 							placeholder="e.g. Coachella 2025"
-							required
 						/>
 					</div>
 
 					<div>
 						<label className={labelClass}>Destination</label>
 						<input
-							id="dest"
 							type="text"
 							value={dest}
 							onChange={(e) => setDest(e.target.value)}
 							className={inputClass}
 							placeholder="e.g. Indio, CA"
-							required
 						/>
 					</div>
 
@@ -103,9 +123,7 @@ export default function TripForm() {
 							className={inputClass}
 						>
 							{Object.entries(TYPE_LABELS).map(([value, label]) => (
-								<option key={value} value={value}>
-									{label}
-								</option>
+								<option key={value} value={value}>{label}</option>
 							))}
 						</select>
 					</div>
@@ -114,23 +132,19 @@ export default function TripForm() {
 						<div>
 							<label className={labelClass}>Start Date</label>
 							<input
-								id="start"
 								type="date"
 								value={start}
 								onChange={(e) => setStart(e.target.value)}
 								className={inputClass}
-								required
 							/>
 						</div>
 						<div>
 							<label className={labelClass}>End Date</label>
 							<input
-								id="end"
 								type="date"
 								value={end}
 								onChange={(e) => setEnd(e.target.value)}
 								className={inputClass}
-								required
 							/>
 						</div>
 					</div>
@@ -158,7 +172,7 @@ export default function TripForm() {
 						disabled={loading}
 						className="flex-1 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2.5 rounded-xl transition-colors cursor-pointer"
 					>
-						{loading ? 'Creating...' : 'Create Trip'}
+						{loading ? (isEdit ? 'Saving…' : 'Creating…') : (isEdit ? 'Update Trip' : 'Create Trip')}
 					</button>
 				</div>
 			</div>
