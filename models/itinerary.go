@@ -16,16 +16,23 @@ import (
 // )
 
 type Itinerary struct {
-	ID          int64  `json:"id"`
-	TripID      int64  `json:"trip_id"`
-	Date        string `json:"date"`
+	ID     int64 `json:"id"`
+	TripID int64 `json:"trip_id"`
+
+	// YYYY-MM-DD
+	Date string `json:"date"`
+
+	// HH:MM:SS
 	Time        string `json:"time"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
 type ItineraryInput struct {
-	Date        string `json:"date"`
+	// YYYY-MM-DD
+	Date string `json:"date"`
+
+	// HH:MM:SS
 	Time        string `json:"time"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
