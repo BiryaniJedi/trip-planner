@@ -71,7 +71,7 @@ export default function TripForm() {
 
 	const labelClass = 'block text-sm font-medium text-slate-600 mb-1';
 	const inputClass =
-		'w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition';
+		'w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition';
 
 	if (initLoading) {
 		return (
@@ -154,7 +154,7 @@ export default function TripForm() {
 							type="checkbox"
 							checked={needVisa}
 							onChange={(e) => setNeedVisa(e.target.checked)}
-							className="w-4 h-4 rounded border-slate-300 accent-indigo-600"
+							className="w-4 h-4 rounded border-slate-300" style={{ accentColor: 'var(--c-p6)' }}
 						/>
 						<span className="text-sm text-slate-600">Visa required</span>
 					</label>
@@ -170,7 +170,7 @@ export default function TripForm() {
 					<button
 						onClick={handleSubmit}
 						disabled={loading}
-						className="flex-1 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white py-2.5 rounded-xl transition-colors cursor-pointer"
+						className="flex-1 text-sm font-medium bg-[var(--c-p6)] hover:bg-[var(--c-p7)] disabled:opacity-50 text-white py-2.5 rounded-xl transition-colors cursor-pointer"
 					>
 						{loading ? (isEdit ? 'Saving…' : 'Creating…') : (isEdit ? 'Update Trip' : 'Create Trip')}
 					</button>

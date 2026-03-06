@@ -80,7 +80,7 @@ export default function TripList() {
 					</div>
 					<button
 						onClick={() => navigate('/trips/new')}
-						className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+						className="bg-[var(--c-p6)] hover:bg-[var(--c-p7)] text-white font-medium px-5 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
 					>
 						+ New Trip
 					</button>
@@ -123,7 +123,7 @@ export default function TripList() {
 								</div>
 								<button
 									onClick={() => navigate(`/trips/${trip.id}`)}
-									className="shrink-0 text-indigo-600 hover:text-indigo-800 font-medium text-sm border border-indigo-200 hover:border-indigo-400 px-4 py-2 rounded-lg transition-colors cursor-pointer"
+									className="shrink-0 text-[var(--c-p6)] hover:text-[var(--c-p8)] font-medium text-sm border border-[var(--c-p2)] hover:border-[var(--c-p4)] px-4 py-2 rounded-lg transition-colors cursor-pointer"
 								>
 									View →
 								</button>

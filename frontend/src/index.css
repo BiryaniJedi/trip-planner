@@ -1,1 +1,42 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+/* Class-based dark mode: dark: variant activates when any ancestor has .dark */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Surface / neutral vars ─────────────────────────────────────────────── */
+:root {
+	color-scheme: light;
+	--c-bg:      #f8fafc; /* slate-50  – page background           */
+	--c-card:    #ffffff; /* white     – card / panel              */
+	--c-border:  #e2e8f0; /* slate-200 – primary border            */
+	--c-border2: #cbd5e1; /* slate-300 – secondary / hover border  */
+	--c-text:    #1e293b; /* slate-800 – primary text              */
+	--c-text2:   #475569; /* slate-600 – secondary text            */
+	--c-text3:   #64748b; /* slate-500 – tertiary text             */
+	--c-muted:   #94a3b8; /* slate-400 – muted / placeholder text  */
+	--c-hover:   #f1f5f9; /* slate-100 – hover background          */
+}
+
+.dark {
+	color-scheme: dark;
+	--c-bg:      #0f172a; /* slate-950 */
+	--c-card:    #1e293b; /* slate-800 */
+	--c-border:  #334155; /* slate-700 */
+	--c-border2: #475569; /* slate-600 */
+	--c-text:    #f1f5f9; /* slate-100 */
+	--c-text2:   #cbd5e1; /* slate-300 */
+	--c-text3:   #94a3b8; /* slate-400 */
+	--c-muted:   #64748b; /* slate-500 */
+	--c-hover:   #334155; /* slate-700 */
+}
+
+/* ── Accent vars (indigo default) – overridden at runtime by ThemeContext ── */
+:root {
+	--c-p1: #e0e7ff;
+	--c-p2: #c7d2fe;
+	--c-p3: #a5b4fc;
+	--c-p4: #818cf8;
+	--c-p6: #4f46e5;
+	--c-p7: #4338ca;
+	--c-p8: #3730a3;
+}

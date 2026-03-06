@@ -29,9 +29,9 @@ const TYPE_COLORS = {
 };
 
 const inputCls =
-	'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition';
+	'w-full border border-[var(--c-border)] rounded-lg px-3 py-2 text-sm text-[var(--c-text)] bg-[var(--c-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition';
 const btnPrimary =
-	'text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50';
+	'text-sm font-medium bg-[var(--c-p6)] hover:bg-[var(--c-p7)] text-white px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50';
 const btnSecondary =
 	'text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg transition-colors cursor-pointer';
 const btnSmDanger = 'text-xs text-red-400 hover:text-red-600 cursor-pointer transition-colors';
@@ -44,7 +44,10 @@ function SectionHeader({ title, onAdd, addLabel = '+ Add' }) {
 		<div className="flex items-center justify-between mb-4">
 			<h2 className="text-base font-semibold text-slate-700">{title}</h2>
 			{onAdd && (
-				<button onClick={onAdd} className="text-xs font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1 rounded-lg transition-colors cursor-pointer">
+				<button
+					onClick={onAdd}
+					className="text-xs font-medium text-[var(--c-p6)] hover:text-[var(--c-p8)] border border-[var(--c-p2)] hover:border-[var(--c-p4)] px-3 py-1 rounded-lg transition-colors cursor-pointer"
+				>
 					{addLabel}
 				</button>
 			)}
@@ -61,8 +64,12 @@ function InlineForm({ children, onCancel, onSave, saving, saveLabel = 'Save' }) 
 		<div className="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3">
 			{children}
 			<div className="flex gap-2 justify-end pt-1">
-				<button className={btnSecondary} onClick={onCancel}>Cancel</button>
-				<button className={btnPrimary} onClick={onSave} disabled={saving}>{saving ? 'Saving…' : saveLabel}</button>
+				<button className={btnSecondary} onClick={onCancel}>
+					Cancel
+				</button>
+				<button className={btnPrimary} onClick={onSave} disabled={saving}>
+					{saving ? 'Saving…' : saveLabel}
+				</button>
 			</div>
 		</div>
 	);
@@ -118,7 +125,9 @@ export default function TripDetails() {
 
 	// ── Load ──────────────────────────────────────────────────────────────────
 
-	useEffect(() => { loadAll(); }, [tripId]);
+	useEffect(() => {
+		loadAll();
+	}, [tripId]);
 
 	const loadAll = async () => {
 		setLoading(true);
@@ -159,7 +168,7 @@ export default function TripDetails() {
 				} catch {
 					return [p.id, null];
 				}
-			})
+			}),
 		);
 		setPhotoURLs(Object.fromEntries(entries));
 	};
@@ -213,7 +222,11 @@ export default function TripDetails() {
 		try {
 			await DeletePhotoById(photoId);
 			setPhotos((ps) => ps.filter((p) => p.id !== photoId));
-			setPhotoURLs((prev) => { const next = { ...prev }; delete next[photoId]; return next; });
+			setPhotoURLs((prev) => {
+				const next = { ...prev };
+				delete next[photoId];
+				return next;
+			});
 			if (lightboxId === photoId) setLightboxId(null);
 		} catch (e) {
 			alert('Failed to delete photo: ' + e);
@@ -223,8 +236,12 @@ export default function TripDetails() {
 	// Lightbox navigation
 	const lightboxIdx = lightboxId !== null ? photos.findIndex((p) => p.id === lightboxId) : -1;
 	const lightboxPhoto = lightboxIdx >= 0 ? photos[lightboxIdx] : null;
-	const handleLightboxPrev = () => { if (lightboxIdx > 0) setLightboxId(photos[lightboxIdx - 1].id); };
-	const handleLightboxNext = () => { if (lightboxIdx < photos.length - 1) setLightboxId(photos[lightboxIdx + 1].id); };
+	const handleLightboxPrev = () => {
+		if (lightboxIdx > 0) setLightboxId(photos[lightboxIdx - 1].id);
+	};
+	const handleLightboxNext = () => {
+		if (lightboxIdx < photos.length - 1) setLightboxId(photos[lightboxIdx + 1].id);
+	};
 
 	// ── Notes ─────────────────────────────────────────────────────────────────
 
@@ -232,7 +249,10 @@ export default function TripDetails() {
 		if (!newNoteTitle.trim()) return;
 		setNoteSaving(true);
 		try {
-			await CreateNoteByTripId(tripId, { title: newNoteTitle.trim(), content: newNoteContent.trim() });
+			await CreateNoteByTripId(tripId, {
+				title: newNoteTitle.trim(),
+				content: newNoteContent.trim(),
+			});
 			setAddingNote(false);
 			setNewNoteTitle('');
 			setNewNoteContent('');
@@ -256,7 +276,10 @@ export default function TripDetails() {
 		if (!editNoteTitle.trim()) return;
 		setNoteSaving(true);
 		try {
-			await UpdateNoteById(noteId, { title: editNoteTitle.trim(), content: editNoteContent.trim() });
+			await UpdateNoteById(noteId, {
+				title: editNoteTitle.trim(),
+				content: editNoteContent.trim(),
+			});
 			setEditingNoteId(null);
 			const notesData = await GetNotesByTripId(tripId);
 			setNotes(notesData ?? []);
@@ -282,7 +305,10 @@ export default function TripDetails() {
 
 	const handleAddLink = async () => {
 		setLinkError('');
-		if (!newLinkName.trim() || !newLinkUrl.trim()) { setLinkError('Name and URL are required.'); return; }
+		if (!newLinkName.trim() || !newLinkUrl.trim()) {
+			setLinkError('Name and URL are required.');
+			return;
+		}
 		setLinkSaving(true);
 		try {
 			await CreateLinkByTripId(tripId, { name: newLinkName.trim(), url: newLinkUrl.trim() });
@@ -307,7 +333,10 @@ export default function TripDetails() {
 
 	const handleSaveLink = async (linkId) => {
 		setLinkError('');
-		if (!editLinkName.trim() || !editLinkUrl.trim()) { setLinkError('Name and URL are required.'); return; }
+		if (!editLinkName.trim() || !editLinkUrl.trim()) {
+			setLinkError('Name and URL are required.');
+			return;
+		}
 		setLinkSaving(true);
 		try {
 			await UpdateLinkById(linkId, { name: editLinkName.trim(), url: editLinkUrl.trim() });
@@ -344,7 +373,9 @@ export default function TripDetails() {
 		return (
 			<div className="h-full flex flex-col items-center justify-center gap-4">
 				<p className="text-red-500 font-medium">{error}</p>
-				<button onClick={() => navigate('/trips')} className={btnSecondary}>← Back to Trips</button>
+				<button onClick={() => navigate('/trips')} className={btnSecondary}>
+					← Back to Trips
+				</button>
 			</div>
 		);
 	}
@@ -361,7 +392,9 @@ export default function TripDetails() {
 		return (
 			<div className="h-full flex flex-col items-center justify-center gap-4">
 				<p className="text-slate-500">Trip not found.</p>
-				<button onClick={() => navigate('/trips')} className={btnSecondary}>← Back to Trips</button>
+				<button onClick={() => navigate('/trips')} className={btnSecondary}>
+					← Back to Trips
+				</button>
 			</div>
 		);
 	}
@@ -373,15 +406,18 @@ export default function TripDetails() {
 	return (
 		<div className="min-h-full bg-slate-50 px-6 py-8">
 			<div className="max-w-4xl mx-auto flex flex-col gap-5">
-
 				{/* ── Hero card ── */}
 				<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
 					<div className="flex items-start justify-between mb-6">
-						<span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${TYPE_COLORS[trip.trip_type] ?? TYPE_COLORS.other}`}>
+						<span
+							className={`text-xs font-semibold px-2.5 py-1 rounded-full ${TYPE_COLORS[trip.trip_type] ?? TYPE_COLORS.other}`}
+						>
 							{TYPE_LABELS[trip.trip_type] ?? trip.trip_type}
 						</span>
 						<div className="flex gap-2">
-							<button onClick={() => navigate(`/trips/${tripId}/edit`)} className={btnSecondary}>Edit</button>
+							<button onClick={() => navigate(`/trips/${tripId}/edit`)} className={btnSecondary}>
+								Edit
+							</button>
 							<button
 								onClick={() => setConfirmDelete(true)}
 								className="text-sm font-medium text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 px-4 py-1.5 rounded-lg transition-colors cursor-pointer"
@@ -395,16 +431,22 @@ export default function TripDetails() {
 
 					<div className="flex flex-wrap gap-5 text-slate-500 text-sm">
 						<span>📍 {trip.destination}</span>
-						<span>📅 {formatDate(trip.start_date)} → {formatDate(trip.end_date)}</span>
+						<span>
+							📅 {formatDate(trip.start_date)} → {formatDate(trip.end_date)}
+						</span>
 						{duration && <span>⏱ {duration}</span>}
 						{trip.need_visa && <span className="text-amber-600 font-medium">🛂 Visa required</span>}
 					</div>
 
 					{confirmDelete && (
 						<div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
-							<p className="text-sm text-red-700 font-medium">Delete this trip and all its data? This cannot be undone.</p>
+							<p className="text-sm text-red-700 font-medium">
+								Delete this trip and all its data? This cannot be undone.
+							</p>
 							<div className="flex gap-2">
-								<button onClick={() => setConfirmDelete(false)} className={btnSecondary}>Cancel</button>
+								<button onClick={() => setConfirmDelete(false)} className={btnSecondary}>
+									Cancel
+								</button>
 								<button
 									onClick={handleDeleteTrip}
 									disabled={deleting}
@@ -423,12 +465,19 @@ export default function TripDetails() {
 
 					{addingPhoto && (
 						<InlineForm
-							onCancel={() => { setAddingPhoto(false); setPendingPath(''); setPendingCaption(''); }}
+							onCancel={() => {
+								setAddingPhoto(false);
+								setPendingPath('');
+								setPendingCaption('');
+							}}
 							onSave={handleConfirmPhoto}
 							saving={photoSaving}
 							saveLabel="Save Photo"
 						>
-							<p className="text-xs text-slate-500 truncate">Selected: <span className="font-medium text-slate-700">{pendingPath.split('/').pop()}</span></p>
+							<p className="text-xs text-slate-500 truncate">
+								Selected:{' '}
+								<span className="font-medium text-slate-700">{pendingPath.split('/').pop()}</span>
+							</p>
 							<input
 								type="text"
 								placeholder="Caption (optional)"
@@ -455,18 +504,23 @@ export default function TripDetails() {
 											<img src={url} alt={photo.caption} className="w-full h-full object-cover" />
 										) : (
 											<div className="w-full h-full flex items-center justify-center">
-												<div className="w-6 h-6 border-2 border-slate-300 border-t-indigo-400 rounded-full animate-spin" />
+												<div className="w-6 h-6 border-2 border-slate-300 border-t-[var(--c-p4)] rounded-full animate-spin" />
 											</div>
 										)}
 										<div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all flex flex-col items-end justify-between p-2">
 											<button
-												onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleDeletePhoto(photo.id);
+												}}
 												className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded-lg cursor-pointer"
 											>
 												Delete
 											</button>
 											{photo.caption && (
-												<p className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs w-full truncate">{photo.caption}</p>
+												<p className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs w-full truncate">
+													{photo.caption}
+												</p>
 											)}
 										</div>
 									</div>
@@ -478,14 +532,23 @@ export default function TripDetails() {
 
 				{/* ── Notes | Links ── */}
 				<div className="grid grid-cols-2 gap-5">
-
 					{/* Notes */}
 					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-						<SectionHeader title="Notes" onAdd={() => { setAddingNote(true); setEditingNoteId(null); }} />
+						<SectionHeader
+							title="Notes"
+							onAdd={() => {
+								setAddingNote(true);
+								setEditingNoteId(null);
+							}}
+						/>
 
 						{addingNote && (
 							<InlineForm
-								onCancel={() => { setAddingNote(false); setNewNoteTitle(''); setNewNoteContent(''); }}
+								onCancel={() => {
+									setAddingNote(false);
+									setNewNoteTitle('');
+									setNewNoteContent('');
+								}}
 								onSave={handleAddNote}
 								saving={noteSaving}
 							>
@@ -509,7 +572,7 @@ export default function TripDetails() {
 						{notes.length === 0 && !addingNote ? (
 							<EmptyMsg>No notes yet.</EmptyMsg>
 						) : (
-							<div className="flex flex-col gap-2">
+							<div className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
 								{notes.map((note) =>
 									editingNoteId === note.id ? (
 										<InlineForm
@@ -539,20 +602,28 @@ export default function TripDetails() {
 											onClick={() => setExpandedNoteId(expandedNoteId === note.id ? null : note.id)}
 										>
 											<div className="flex items-start justify-between gap-2">
-												<p className="text-sm font-medium text-slate-700 leading-snug">{note.title}</p>
+												<p className="text-sm font-medium text-slate-700 leading-snug">
+													{note.title}
+												</p>
 												<div className="flex gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-													<button className={btnSmGhost} onClick={() => startEditNote(note)}>Edit</button>
-													<button className={btnSmDanger} onClick={() => handleDeleteNote(note.id)}>Delete</button>
+													<button className={btnSmGhost} onClick={() => startEditNote(note)}>
+														Edit
+													</button>
+													<button className={btnSmDanger} onClick={() => handleDeleteNote(note.id)}>
+														Delete
+													</button>
 												</div>
 											</div>
 											{expandedNoteId === note.id && note.content && (
-												<p className="text-sm text-slate-500 mt-2 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+												<p className="text-sm text-slate-500 mt-2 whitespace-pre-wrap leading-relaxed">
+													{note.content}
+												</p>
 											)}
 											{expandedNoteId !== note.id && note.content && (
 												<p className="text-xs text-slate-400 mt-1 truncate">{note.content}</p>
 											)}
 										</div>
-									)
+									),
 								)}
 							</div>
 						)}
@@ -560,11 +631,23 @@ export default function TripDetails() {
 
 					{/* Links */}
 					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-						<SectionHeader title="Links" onAdd={() => { setAddingLink(true); setEditingLinkId(null); setLinkError(''); }} />
+						<SectionHeader
+							title="Links"
+							onAdd={() => {
+								setAddingLink(true);
+								setEditingLinkId(null);
+								setLinkError('');
+							}}
+						/>
 
 						{addingLink && (
 							<InlineForm
-								onCancel={() => { setAddingLink(false); setNewLinkName(''); setNewLinkUrl(''); setLinkError(''); }}
+								onCancel={() => {
+									setAddingLink(false);
+									setNewLinkName('');
+									setNewLinkUrl('');
+									setLinkError('');
+								}}
 								onSave={handleAddLink}
 								saving={linkSaving}
 							>
@@ -589,12 +672,15 @@ export default function TripDetails() {
 						{links.length === 0 && !addingLink ? (
 							<EmptyMsg>No links yet.</EmptyMsg>
 						) : (
-							<div className="flex flex-col gap-2">
+							<div className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
 								{links.map((link) =>
 									editingLinkId === link.id ? (
 										<InlineForm
 											key={link.id}
-											onCancel={() => { setEditingLinkId(null); setLinkError(''); }}
+											onCancel={() => {
+												setEditingLinkId(null);
+												setLinkError('');
+											}}
 											onSave={() => handleSaveLink(link.id)}
 											saving={linkSaving}
 											saveLabel="Update"
@@ -614,7 +700,10 @@ export default function TripDetails() {
 											{linkError && <p className="text-xs text-red-500">{linkError}</p>}
 										</InlineForm>
 									) : (
-										<div key={link.id} className="flex items-center gap-2 border border-slate-100 rounded-xl px-3 py-2.5 hover:border-slate-200 transition-colors">
+										<div
+											key={link.id}
+											className="flex items-center gap-2 border border-slate-100 rounded-xl px-3 py-2.5 hover:border-slate-200 transition-colors"
+										>
 											<div className="flex-1 min-w-0">
 												<p className="text-sm font-medium text-slate-700 truncate">{link.name}</p>
 												<p className="text-xs text-slate-400 truncate">{link.url}</p>
@@ -622,15 +711,19 @@ export default function TripDetails() {
 											<div className="flex gap-2 shrink-0">
 												<button
 													onClick={() => BrowserOpenURL(link.url)}
-													className="text-xs font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+													className="text-xs font-medium text-[var(--c-p6)] hover:text-[var(--c-p8)] border border-[var(--c-p2)] hover:border-[var(--c-p4)] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
 												>
 													Open ↗
 												</button>
-												<button className={btnSmGhost} onClick={() => startEditLink(link)}>Edit</button>
-												<button className={btnSmDanger} onClick={() => handleDeleteLink(link.id)}>Delete</button>
+												<button className={btnSmGhost} onClick={() => startEditLink(link)}>
+													Edit
+												</button>
+												<button className={btnSmDanger} onClick={() => handleDeleteLink(link.id)}>
+													Delete
+												</button>
 											</div>
 										</div>
-									)
+									),
 								)}
 							</div>
 						)}
@@ -641,10 +734,7 @@ export default function TripDetails() {
 				<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
 					<div className="flex items-center justify-between mb-4">
 						<h2 className="text-base font-semibold text-slate-700">Expenses</h2>
-						<button
-							onClick={() => navigate(`/trips/${tripId}/expenses`)}
-							className={btnSecondary}
-						>
+						<button onClick={() => navigate(`/trips/${tripId}/expenses`)} className={btnSecondary}>
 							Manage →
 						</button>
 					</div>
@@ -655,15 +745,18 @@ export default function TripDetails() {
 						<div className="flex flex-wrap gap-6 items-end">
 							{Object.entries(expenseTotals).map(([currency, total]) => (
 								<div key={currency}>
-									<p className="text-3xl font-bold text-slate-800">{formatCents(total, currency)}</p>
+									<p className="text-3xl font-bold text-slate-800">
+										{formatCents(total, currency)}
+									</p>
 									<p className="text-xs text-slate-400 mt-0.5">{currency} total</p>
 								</div>
 							))}
-							<p className="text-sm text-slate-400 ml-auto">{expenses.length} expense{expenses.length !== 1 ? 's' : ''}</p>
+							<p className="text-sm text-slate-400 ml-auto">
+								{expenses.length} expense{expenses.length !== 1 ? 's' : ''}
+							</p>
 						</div>
 					)}
 				</div>
-
 			</div>
 
 			{/* ── Lightbox ── */}
@@ -675,13 +768,19 @@ export default function TripDetails() {
 					{lightboxIdx > 0 && (
 						<button
 							className="absolute left-5 text-white/70 hover:text-white text-4xl cursor-pointer select-none"
-							onClick={(e) => { e.stopPropagation(); handleLightboxPrev(); }}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleLightboxPrev();
+							}}
 						>
 							‹
 						</button>
 					)}
 
-					<div className="flex flex-col items-center gap-3 max-w-[80vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+					<div
+						className="flex flex-col items-center gap-3 max-w-[80vw] max-h-[90vh]"
+						onClick={(e) => e.stopPropagation()}
+					>
 						{photoURLs[lightboxId] && (
 							<img
 								src={photoURLs[lightboxId]}
@@ -697,7 +796,10 @@ export default function TripDetails() {
 					{lightboxIdx < photos.length - 1 && (
 						<button
 							className="absolute right-5 text-white/70 hover:text-white text-4xl cursor-pointer select-none"
-							onClick={(e) => { e.stopPropagation(); handleLightboxNext(); }}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleLightboxNext();
+							}}
 						>
 							›
 						</button>

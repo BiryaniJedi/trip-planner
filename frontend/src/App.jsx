@@ -1,4 +1,5 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './ThemeContext';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import TripList from './components/TripList';
@@ -8,8 +9,9 @@ import Expenses from './components/Expenses';
 
 function App() {
 	return (
+		<ThemeProvider>
 		<HashRouter>
-			<div className="flex h-screen overflow-hidden bg-slate-50">
+			<div className="flex h-screen overflow-hidden bg-[var(--c-bg)]">
 				<Sidebar />
 				<main className="flex-1 overflow-y-auto">
 					<Routes>
@@ -23,6 +25,7 @@ function App() {
 				</main>
 			</div>
 		</HashRouter>
+		</ThemeProvider>
 	);
 }
 

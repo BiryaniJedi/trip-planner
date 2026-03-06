@@ -12,9 +12,9 @@ import { CATEGORY_ICONS, CATEGORY_LABELS, CURRENCIES, formatCents, parseCents } 
 const CATEGORIES = ['flight', 'hotel', 'car', 'festival', 'food', 'activity', 'other'];
 
 const inputCls =
-	'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition';
+	'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition';
 const btnPrimary =
-	'text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50';
+	'text-sm font-medium bg-[var(--c-p6)] hover:bg-[var(--c-p7)] text-white px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50';
 const btnSecondary =
 	'text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg transition-colors cursor-pointer';
 
