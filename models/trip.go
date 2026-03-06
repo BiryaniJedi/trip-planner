@@ -168,7 +168,7 @@ func (s *TripsService) UpdateTripById(id int64, t TripInput) error {
 	return nil
 }
 
-// DeleteTrip deletes a trip and all its expenses (CASCADE handles expenses)
+// DeleteTrip deletes a trip and all its expenses (CASCADE handles expenses), and deletes photos
 func (s *TripsService) DeleteTripById(id int64) error {
 	_, err := s.db.Exec(`DELETE FROM trips WHERE id = ?`, id)
 	if err != nil {

@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -17,10 +19,16 @@ var assets embed.FS
 func main() {
 	database, err := db.Init()
 	if err != nil {
-		log.Fatalf("failed to init database: %w", err)
+		log.Fatalf("failed to init database: %v", err)
 	}
 
-	app := NewApp(database)
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("could not determine home directory: %v", err)
+	}
+	photoDir := filepath.Join(home, ".trip-planner", "photos")
+
+	app := NewApp(database, photoDir)
 
 	err = wails.Run(&options.App{
 		Title:  "Trip Planner",
