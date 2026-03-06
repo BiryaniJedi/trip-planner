@@ -2,8 +2,15 @@
 // Takes a "YYYY-MM-DD" string and returns a human-readable date like "Jan 2, 2026".
 // Return "TBD" if dateStr is empty.
 // Hint: new Date(dateStr + 'T00:00:00').toLocaleDateString(...)
+//
+
 export function formatDate(dateStr) {
-	// TODO
+	const date = new Date(dateStr + 'T00:00:00');
+	return date.toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
 }
 
 // toTitleCase(str)

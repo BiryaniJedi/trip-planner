@@ -86,7 +86,7 @@ func (s *TripsService) GetTripByID(id int64) (Trip, error) {
 			t.start_date,
 			t.end_date,
 			t.trip_type,
-			t.need_visa,
+			t.need_visa
 		FROM trips t 
 		WHERE t.id = ?
 	`

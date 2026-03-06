@@ -1,25 +1,25 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import TripList from './components/TripList';
-// import TripDetail from './components/TripDetail';
+import TripDetails from './components/TripDetails';
 import TripForm from './components/TripForm';
 
 function App() {
-	// TODO: render a HashRouter containing Routes with these four paths:
-	//   /               → TripList
-	//   /trips/new      → TripForm
-	//   /trips/:id      → TripDetail
-	//   /trips/:id/edit → TripForm
-
 	return (
 		<HashRouter>
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/trips" element={<TripList />} />
-				<Route path="/trips/new" element={<TripForm />} />
-				{/* <Route path="/trips/:id" element={<TripDetail />} /> */}
-				{/* <Route path="/trips/:id/edit" element={<TripForm />} /> */}
-			</Routes>
+			<div className="flex h-screen overflow-hidden bg-slate-50">
+				<Sidebar />
+				<main className="flex-1 overflow-y-auto">
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route path="/trips" element={<TripList />} />
+						<Route path="/trips/new" element={<TripForm />} />
+						<Route path="/trips/:id" element={<TripDetails />} />
+						<Route path="/trips/:id/edit" element={<TripForm />} />
+					</Routes>
+				</main>
+			</div>
 		</HashRouter>
 	);
 }
