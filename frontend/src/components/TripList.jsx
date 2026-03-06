@@ -10,7 +10,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GetAllTrips, DeleteTripById } from '../../wailsjs/go/main/App';
-import { TYPE_LABELS, toTitleCase } from '../utils';
+import { TYPE_LABELS, toTitleCase, formatDate } from '../utils';
 
 const TYPE_COLORS = {
 	travel: 'bg-sky-100 text-sky-700',
@@ -117,8 +117,8 @@ export default function TripList() {
 									<p className="text-slate-500 text-sm mt-0.5">{trip.destination}</p>
 									<p className="text-slate-400 text-xs mt-1">
 										{trip.start_date && trip.end_date
-											? `${trip.start_date} → ${trip.end_date}`
-											: trip.start_date || 'Dates TBD'}
+											? `${formatDate(trip.start_date)} → ${formatDate(trip.end_date)}`
+											: formatDate(trip.start_date) || 'Dates TBD'}
 									</p>
 								</div>
 								<button

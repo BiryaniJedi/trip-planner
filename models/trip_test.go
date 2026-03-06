@@ -1,13 +1,14 @@
 package models
 
 import (
-	// "errors"
-	"fmt"
-	"github.com/BiryaniJedi/trip-planner/db"
+	"database/sql"
+	"errors"
 	"testing"
+
+	"github.com/BiryaniJedi/trip-planner/db"
 )
 
-// newService is a test helper that spins up a fresh in-memory DB for each test.
+// newService spins up a fresh in-memory DB for each test.
 func newService(t *testing.T) *TripsService {
 	t.Helper()
 	database, err := db.NewTestDB()
@@ -18,24 +19,99 @@ func newService(t *testing.T) *TripsService {
 	return NewTripsService(database)
 }
 
-// --- CreateTrip ---
-
-func TestCreateTrip(t *testing.T) {
-	s := newService(t)
-
-	input := TripInput{
+// sampleInput returns a fully-populated TripInput for reuse across tests.
+func sampleInput() TripInput {
+	return TripInput{
 		Name:        "Coachella 2026",
 		Destination: "Indio, CA",
 		StartDate:   "2026-04-10",
-		EndDate:     "2026-04-12",
+		EndDate:     "2026-04-20",
 		TripType:    TripTypeFestival,
+		NeedVisa:    false,
+	}
+}
+
+// --- CreateTrip ---
+
+func TestCreateTrip_returnsID(t *testing.T) {
+	s := newService(t)
+
+	id, err := s.CreateTrip(sampleInput())
+	if err != nil {
+		t.Fatalf("CreateTrip: %v", err)
+	}
+	if id <= 0 {
+		t.Errorf("expected id > 0, got %d", id)
+	}
+}
+
+func TestCreateTrip_fieldsRoundTrip(t *testing.T) {
+	s := newService(t)
+	in := sampleInput()
+
+	id, err := s.CreateTrip(in)
+	if err != nil {
+		t.Fatalf("CreateTrip: %v", err)
 	}
 
-	createdId, err := s.CreateTrip(input)
+	got, err := s.GetTripByID(id)
 	if err != nil {
-		t.Fatalf("CreateTrip error: %v", err)
+		t.Fatalf("GetTripByID: %v", err)
 	}
-	fmt.Printf("%d", createdId)
+
+	if got.Name != in.Name {
+		t.Errorf("Name: got %q, want %q", got.Name, in.Name)
+	}
+	if got.Destination != in.Destination {
+		t.Errorf("Destination: got %q, want %q", got.Destination, in.Destination)
+	}
+	if got.StartDate != in.StartDate {
+		t.Errorf("StartDate: got %q, want %q", got.StartDate, in.StartDate)
+	}
+	if got.EndDate != in.EndDate {
+		t.Errorf("EndDate: got %q, want %q", got.EndDate, in.EndDate)
+	}
+	if got.TripType != in.TripType {
+		t.Errorf("TripType: got %q, want %q", got.TripType, in.TripType)
+	}
+	if got.NeedVisa != in.NeedVisa {
+		t.Errorf("NeedVisa: got %v, want %v", got.NeedVisa, in.NeedVisa)
+	}
+}
+
+func TestCreateTrip_needVisaTrue(t *testing.T) {
+	s := newService(t)
+	in := sampleInput()
+	in.NeedVisa = true
+
+	id, err := s.CreateTrip(in)
+	if err != nil {
+		t.Fatalf("CreateTrip: %v", err)
+	}
+
+	got, err := s.GetTripByID(id)
+	if err != nil {
+		t.Fatalf("GetTripByID: %v", err)
+	}
+	if !got.NeedVisa {
+		t.Error("NeedVisa: got false, want true")
+	}
+}
+
+func TestCreateTrip_idsAreUnique(t *testing.T) {
+	s := newService(t)
+
+	id1, err := s.CreateTrip(sampleInput())
+	if err != nil {
+		t.Fatalf("first CreateTrip: %v", err)
+	}
+	id2, err := s.CreateTrip(sampleInput())
+	if err != nil {
+		t.Fatalf("second CreateTrip: %v", err)
+	}
+	if id1 == id2 {
+		t.Errorf("expected unique IDs, both got %d", id1)
+	}
 }
 
 // --- GetAllTrips ---
@@ -45,7 +121,7 @@ func TestGetAllTrips_empty(t *testing.T) {
 
 	trips, err := s.GetAllTrips()
 	if err != nil {
-		t.Fatalf("GetAllTrips error: %v", err)
+		t.Fatalf("GetAllTrips: %v", err)
 	}
 	if len(trips) != 0 {
 		t.Errorf("expected 0 trips, got %d", len(trips))
@@ -59,13 +135,13 @@ func TestGetAllTrips_returnsAll(t *testing.T) {
 	for _, name := range names {
 		_, err := s.CreateTrip(TripInput{Name: name, Destination: "Somewhere", TripType: TripTypeTravel})
 		if err != nil {
-			t.Fatalf("CreateTrip: %v", err)
+			t.Fatalf("CreateTrip %q: %v", name, err)
 		}
 	}
 
 	trips, err := s.GetAllTrips()
 	if err != nil {
-		t.Fatalf("GetAllTrips error: %v", err)
+		t.Fatalf("GetAllTrips: %v", err)
 	}
 	if len(trips) != len(names) {
 		t.Errorf("expected %d trips, got %d", len(names), len(trips))
@@ -77,104 +153,103 @@ func TestGetAllTrips_returnsAll(t *testing.T) {
 func TestGetTripByID(t *testing.T) {
 	s := newService(t)
 
-	createdId, err := s.CreateTrip(TripInput{
-		Name:        "Road trip",
-		Destination: "Route 66",
-		TripType:    TripTypeRoadtrip,
-	})
+	id, err := s.CreateTrip(sampleInput())
 	if err != nil {
 		t.Fatalf("CreateTrip: %v", err)
 	}
 
-	got, err := s.GetTripByID(createdId)
+	got, err := s.GetTripByID(id)
 	if err != nil {
-		t.Fatalf("GetTripByID error: %v", err)
+		t.Fatalf("GetTripByID: %v", err)
 	}
-	if got.ID != createdId {
-		t.Errorf("ID: got %d, want %d", got.ID, createdId)
+	if got.ID != id {
+		t.Errorf("ID: got %d, want %d", got.ID, id)
 	}
 }
 
-// func TestGetTripByID_notFound(t *testing.T) {
-// 	s := newService(t)
-//
-// 	_, err := s.GetTripByID(999)
-// 	if !errors.Is(err, ErrNotFound) {
-// 		t.Errorf("expected ErrNotFound, got %v", err)
-// 	}
-// }
-//
-// // --- UpdateTrip ---
-//
-// func TestUpdateTrip(t *testing.T) {
-// 	s := newService(t)
-//
-// 	created, err := s.CreateTrip(TripInput{
-// 		Name:        "Old name",
-// 		Destination: "Old place",
-// 		TripType:    TripTypeOther,
-// 	})
-// 	if err != nil {
-// 		t.Fatalf("CreateTrip: %v", err)
-// 	}
-//
-// 	created.Name = "New name"
-// 	created.Destination = "New place"
-// 	created.TripType = TripTypeTravel
-//
-// 	if err := s.UpdateTrip(created); err != nil {
-// 		t.Fatalf("UpdateTrip error: %v", err)
-// 	}
-//
-// 	got, err := s.GetTripByID(created.ID)
-// 	if err != nil {
-// 		t.Fatalf("GetTripByID after update: %v", err)
-// 	}
-// 	if got.Name != "New name" {
-// 		t.Errorf("Name: got %q, want %q", got.Name, "New name")
-// 	}
-// 	if got.Destination != "New place" {
-// 		t.Errorf("Destination: got %q, want %q", got.Destination, "New place")
-// 	}
-// 	if got.TripType != TripTypeTravel {
-// 		t.Errorf("TripType: got %q, want %q", got.TripType, TripTypeTravel)
-// 	}
-// }
-//
-// func TestUpdateTrip_notFound(t *testing.T) {
-// 	s := newService(t)
-//
-// 	err := s.UpdateTrip(Trip{ID: 999, Name: "Ghost", Destination: "Nowhere", TripType: TripTypeOther})
-// 	if !errors.Is(err, ErrNotFound) {
-// 		t.Errorf("expected ErrNotFound, got %v", err)
-// 	}
-// }
-//
-// // --- DeleteTrip ---
-//
-// func TestDeleteTrip(t *testing.T) {
-// 	s := newService(t)
-//
-// 	created, err := s.CreateTrip(Trip{Name: "To delete", Destination: "Anywhere", TripType: TripTypeTravel})
-// 	if err != nil {
-// 		t.Fatalf("CreateTrip: %v", err)
-// 	}
-//
-// 	if err := s.DeleteTrip(created.ID); err != nil {
-// 		t.Fatalf("DeleteTrip error: %v", err)
-// 	}
-//
-// 	_, err = s.GetTripByID(created.ID)
-// 	if !errors.Is(err, ErrNotFound) {
-// 		t.Errorf("expected ErrNotFound after delete, got %v", err)
-// 	}
-// }
-//
-// func TestDeleteTrip_notFound(t *testing.T) {
-// 	s := newService(t)
-//
-// 	err := s.DeleteTrip(999)
-// 	if !errors.Is(err, ErrNotFound) {
-// 		t.Errorf("expected ErrNotFound, got %v", err)
-// 	}
-// }
+func TestGetTripByID_notFound(t *testing.T) {
+	s := newService(t)
+
+	_, err := s.GetTripByID(999)
+	if !errors.Is(err, sql.ErrNoRows) {
+		t.Errorf("expected sql.ErrNoRows, got %v", err)
+	}
+}
+
+// --- UpdateTripById ---
+
+func TestUpdateTripById(t *testing.T) {
+	s := newService(t)
+
+	id, err := s.CreateTrip(sampleInput())
+	if err != nil {
+		t.Fatalf("CreateTrip: %v", err)
+	}
+
+	updated := TripInput{
+		Name:        "Updated Name",
+		Destination: "New Place",
+		StartDate:   "2026-05-01",
+		EndDate:     "2026-05-10",
+		TripType:    TripTypeRoadtrip,
+		NeedVisa:    true,
+	}
+
+	if err := s.UpdateTripById(id, updated); err != nil {
+		t.Fatalf("UpdateTripById: %v", err)
+	}
+
+	got, err := s.GetTripByID(id)
+	if err != nil {
+		t.Fatalf("GetTripByID after update: %v", err)
+	}
+	if got.Name != updated.Name {
+		t.Errorf("Name: got %q, want %q", got.Name, updated.Name)
+	}
+	if got.Destination != updated.Destination {
+		t.Errorf("Destination: got %q, want %q", got.Destination, updated.Destination)
+	}
+	if got.TripType != updated.TripType {
+		t.Errorf("TripType: got %q, want %q", got.TripType, updated.TripType)
+	}
+	if got.NeedVisa != updated.NeedVisa {
+		t.Errorf("NeedVisa: got %v, want %v", got.NeedVisa, updated.NeedVisa)
+	}
+}
+
+func TestUpdateTripById_nonExistentIsNoOp(t *testing.T) {
+	s := newService(t)
+
+	err := s.UpdateTripById(999, sampleInput())
+	if err != nil {
+		t.Errorf("expected no error updating non-existent trip, got %v", err)
+	}
+}
+
+// --- DeleteTripById ---
+
+func TestDeleteTripById(t *testing.T) {
+	s := newService(t)
+
+	id, err := s.CreateTrip(sampleInput())
+	if err != nil {
+		t.Fatalf("CreateTrip: %v", err)
+	}
+
+	if err := s.DeleteTripById(id); err != nil {
+		t.Fatalf("DeleteTripById: %v", err)
+	}
+
+	_, err = s.GetTripByID(id)
+	if !errors.Is(err, sql.ErrNoRows) {
+		t.Errorf("expected sql.ErrNoRows after delete, got %v", err)
+	}
+}
+
+func TestDeleteTripById_isIdempotent(t *testing.T) {
+	s := newService(t)
+
+	if err := s.DeleteTripById(999); err != nil {
+		t.Errorf("expected no error deleting non-existent trip, got %v", err)
+	}
+}

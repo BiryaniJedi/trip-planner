@@ -141,7 +141,7 @@ func (s *TripsService) CreateTrip(t TripInput) (int64, error) {
 }
 
 // UpdateTrip updates name, destination, dates, notes, type
-func (s *TripsService) UpdateTripById(id int64, t TripInput) (int64, error) {
+func (s *TripsService) UpdateTripById(id int64, t TripInput) error {
 	query := `
 		UPDATE trips
 		SET name = ?,
@@ -149,11 +149,10 @@ func (s *TripsService) UpdateTripById(id int64, t TripInput) (int64, error) {
 			start_date = ?,
 			end_date = ?,
 			trip_type = ?,
-			need_visa = ?,
+			need_visa = ?
 		WHERE id = ?
 	`
-	var resId int64
-	err := s.db.QueryRow(query,
+	_, err := s.db.Exec(query,
 		t.Name,
 		t.Destination,
 		t.StartDate,
@@ -161,14 +160,12 @@ func (s *TripsService) UpdateTripById(id int64, t TripInput) (int64, error) {
 		t.TripType,
 		t.NeedVisa,
 		id,
-	).Scan(
-		&resId,
 	)
 	if err != nil {
-		return 0, fmt.Errorf("Update trip query error: %w", err)
+		return fmt.Errorf("Update trip query error: %w", err)
 	}
 
-	return resId, nil
+	return nil
 }
 
 // DeleteTrip deletes a trip and all its expenses (CASCADE handles expenses)
