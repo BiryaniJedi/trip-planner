@@ -26,12 +26,12 @@ type Trip struct {
 }
 
 type TripInput struct {
-	Name        string   `json:"name"`
-	Destination string   `json:"destination"`
-	StartDate   string   `json:"start_date"`
-	EndDate     string   `json:"end_date"`
-	TripType    TripType `json:"trip_type"`
-	NeedVisa    bool     `json:"need_visa"`
+	Name        string   `json:"name" jsonschema:"required"`
+	Destination string   `json:"destination" jsonschema:"required"`
+	StartDate   string   `json:"start_date" jsonschema:"required"`
+	EndDate     string   `json:"end_date" jsonschema:"required"`
+	TripType    TripType `json:"trip_type" jsonschema:"required"`
+	NeedVisa    bool     `json:"need_visa" jsonschema:"required"`
 }
 
 type TripsService struct {

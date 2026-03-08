@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,6 +23,7 @@ type App struct {
 	linksService       *models.LinksService
 	photosService      *models.PhotosService
 	itinerariesService *models.ItinerariesService
+	aiService          *models.AIService
 }
 
 func NewApp(db *sql.DB, photoDir string) *App {
@@ -32,11 +34,15 @@ func NewApp(db *sql.DB, photoDir string) *App {
 		linksService:       models.NewLinksService(db),
 		photosService:      models.NewPhotosService(db, photoDir),
 		itinerariesService: models.NewItinerariesService(db),
+		aiService:          models.NewAIServiceService(db),
 	}
 }
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	// b, _ := json.MarshalIndent(models.AITripPlanSchema, "", "  ")
+	// fmt.Println("AITripPlanSchema:")
+	// fmt.Println(string(b))
 }
 
 func (a *App) Ping() string {
@@ -225,3 +231,5 @@ func (a *App) UpdateItineraryById(itineraryId int64, input models.ItineraryInput
 func (a *App) DeleteItineraryById(itineraryId int64) error {
 	return a.itinerariesService.DeleteItineraryById(itineraryId)
 }
+
+// AI

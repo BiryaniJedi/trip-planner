@@ -36,11 +36,11 @@ type Expense struct {
 }
 
 type ExpenseInput struct {
-	Name     string     `json:"name"`
-	Category ExpenseCat `json:"category"`
-	Amount   int64      `json:"amount"`
-	Currency Currency   `json:"currency"`
-	Note     string     `json:"note"`
+	Name     string     `json:"name" jsonschema:"required"`
+	Category ExpenseCat `json:"category" jsonschema:"required"`
+	Amount   int64      `json:"amount" jsonschema:"required"`
+	Currency Currency   `json:"currency" jsonschema:"required"`
+	Note     string     `json:"note" jsonschema:"required"`
 }
 
 type ExpensesService struct {

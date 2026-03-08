@@ -15,8 +15,8 @@ type Link struct {
 }
 
 type LinkInput struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	Name string `json:"name" jsonschema:"required"`
+	Url  string `json:"url" jsonschema:"required`
 }
 
 type LinksService struct {

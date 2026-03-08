@@ -5,7 +5,7 @@ package models
 // without spending API credits or needing an internet connection.
 //
 // The compile-time guard in ai_test.go ensures this always satisfies the interface:
-var _ TripPlannerAI = (*MockTripPlanner)(nil)
+var _ *MockTripPlanner = (*MockTripPlanner)(nil)
 
 type MockTripPlanner struct{}
 
@@ -35,8 +35,14 @@ type MockTripPlanner struct{}
 func (m *MockTripPlanner) GenerateTripPlan(req TripAIRequest) (AITripPlan, error) {
 	plans := []AITripPlan{
 		{
-			TripName: "Mumbai 2026",
-			NeedVisa: true,
+			Trip: TripInput{
+				Name:        "Mumbai 2026",
+				Destination: "Mumbai, India",
+				StartDate:   "2026-06-01",
+				EndDate:     "2026-06-15",
+				NeedVisa:    true,
+				TripType:    TripTypeTravel,
+			},
 			Expenses: []ExpenseInput{
 				{
 					Name:     "Flight",

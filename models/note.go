@@ -14,8 +14,8 @@ type Note struct {
 }
 
 type NoteInput struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title   string `json:"title" jsonschema:"required"`
+	Content string `json:"content" jsonschema:"required"`
 }
 
 type NotesService struct {
