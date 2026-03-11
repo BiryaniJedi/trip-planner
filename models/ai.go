@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
+	// "fmt"
 	_ "modernc.org/sqlite"
 )
 
@@ -103,9 +103,10 @@ type AIService struct {
 }
 
 func NewAIServiceService(database *sql.DB) *AIService {
+	// PrintAITripPlanSchema()
 	return &AIService{database}
 }
 
-func (s *AIService) PrintAITripPlanSchema() {
-	fmt.Printf("%v\n", AITripPlanSchema)
+func (as *AIService) SearchWeb(searcher *MockWebSearcher) (WebSearchResult, error) {
+	return searcher.Search(TripAIRequest{})
 }

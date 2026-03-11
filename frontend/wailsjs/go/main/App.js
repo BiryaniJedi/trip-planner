@@ -106,6 +106,10 @@ export function GetTripByID(arg1) {
   return window['go']['main']['App']['GetTripByID'](arg1);
 }
 
+export function GetWebSearchTrip() {
+  return window['go']['main']['App']['GetWebSearchTrip']();
+}
+
 export function PickPhotoFile() {
   return window['go']['main']['App']['PickPhotoFile']();
 }

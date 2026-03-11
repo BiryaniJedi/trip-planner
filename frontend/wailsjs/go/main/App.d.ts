@@ -54,6 +54,8 @@ export function GetPhotosByTripId(arg1:number):Promise<Array<models.Photo>>;
 
 export function GetTripByID(arg1:number):Promise<models.Trip>;
 
+export function GetWebSearchTrip():Promise<models.WebSearchResult>;
+
 export function PickPhotoFile():Promise<string>;
 
 export function Ping():Promise<string>;

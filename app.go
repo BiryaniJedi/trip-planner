@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -24,6 +24,7 @@ type App struct {
 	photosService      *models.PhotosService
 	itinerariesService *models.ItinerariesService
 	aiService          *models.AIService
+	mockWebSearcher    *models.MockWebSearcher
 }
 
 func NewApp(db *sql.DB, photoDir string) *App {
@@ -35,6 +36,7 @@ func NewApp(db *sql.DB, photoDir string) *App {
 		photosService:      models.NewPhotosService(db, photoDir),
 		itinerariesService: models.NewItinerariesService(db),
 		aiService:          models.NewAIServiceService(db),
+		mockWebSearcher:    &models.MockWebSearcher{},
 	}
 }
 
@@ -233,3 +235,11 @@ func (a *App) DeleteItineraryById(itineraryId int64) error {
 }
 
 // AI
+
+func (a *App) GetWebSearchTrip() (models.WebSearchResult, error) {
+	data, err := a.aiService.SearchWeb(a.mockWebSearcher)
+	if err != nil {
+		return models.WebSearchResult{}, err
+	}
+	return data, nil
+}

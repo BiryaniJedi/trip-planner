@@ -212,6 +212,20 @@ export namespace models {
 	        this.need_visa = source["need_visa"];
 	    }
 	}
+	export class WebSearchResult {
+	    RawText: string;
+	    Sources: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new WebSearchResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.RawText = source["RawText"];
+	        this.Sources = source["Sources"];
+	    }
+	}
 
 }
 

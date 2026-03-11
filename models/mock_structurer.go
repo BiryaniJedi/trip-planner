@@ -5,9 +5,9 @@ package models
 // without spending API credits or needing an internet connection.
 //
 // The compile-time guard in ai_test.go ensures this always satisfies the interface:
-var _ *MockTripPlanner = (*MockTripPlanner)(nil)
+var _ *MockStructurer = (*MockStructurer)(nil)
 
-type MockTripPlanner struct{}
+type MockStructurer struct{}
 
 // GenerateTripPlan returns a realistic hardcoded AITripPlan.
 //
@@ -32,7 +32,7 @@ type MockTripPlanner struct{}
 //		Notes     []NoteInput      `json:"notes"`
 //		Itinerary []ItineraryInput `json:"itinerary"`
 //	}
-func (m *MockTripPlanner) GenerateTripPlan(req TripAIRequest) (AITripPlan, error) {
+func (m *MockStructurer) GenerateTripPlan(req TripAIRequest) (AITripPlan, error) {
 	plans := []AITripPlan{
 		{
 			Trip: TripInput{
