@@ -28,6 +28,8 @@ export function DeletePhotoById(arg1:number):Promise<void>;
 
 export function DeleteTripById(arg1:number):Promise<void>;
 
+export function GenerateAITripPlan():Promise<number>;
+
 export function GetAllTrips():Promise<Array<models.Trip>>;
 
 export function GetExpenseById(arg1:number):Promise<models.Expense>;
@@ -53,8 +55,6 @@ export function GetPhotoById(arg1:number):Promise<models.Photo>;
 export function GetPhotosByTripId(arg1:number):Promise<Array<models.Photo>>;
 
 export function GetTripByID(arg1:number):Promise<models.Trip>;
-
-export function GetWebSearchTrip():Promise<models.WebSearchResult>;
 
 export function PickPhotoFile():Promise<string>;
 

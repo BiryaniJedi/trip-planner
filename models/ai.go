@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	// "fmt"
+	"fmt"
 	_ "modernc.org/sqlite"
 )
 
@@ -107,6 +107,14 @@ func NewAIServiceService(database *sql.DB) *AIService {
 	return &AIService{database}
 }
 
-func (as *AIService) SearchWeb(searcher *MockWebSearcher) (WebSearchResult, error) {
-	return searcher.Search(TripAIRequest{})
+func (as *AIService) SearchWeb(searcher *MockWebSearcher, tripAIInput TripAIRequest) (WebSearchResult, error) {
+	return searcher.Search(tripAIInput)
+}
+
+func (as *AIService) StructureWebResult(structurer *MockStructurer, result WebSearchResult) (AITripPlan, error) {
+	structured, err := structurer.GenerateTripPlan(result)
+	if err != nil {
+		return AITripPlan{}, fmt.Errorf("Error structuring web search result: %v", err)
+	}
+	return structured, nil
 }

@@ -32,7 +32,7 @@ type MockStructurer struct{}
 //		Notes     []NoteInput      `json:"notes"`
 //		Itinerary []ItineraryInput `json:"itinerary"`
 //	}
-func (m *MockStructurer) GenerateTripPlan(req TripAIRequest) (AITripPlan, error) {
+func (m *MockStructurer) GenerateTripPlan(result WebSearchResult) (AITripPlan, error) {
 	plans := []AITripPlan{
 		{
 			Trip: TripInput{

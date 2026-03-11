@@ -25,6 +25,7 @@ type App struct {
 	itinerariesService *models.ItinerariesService
 	aiService          *models.AIService
 	mockWebSearcher    *models.MockWebSearcher
+	mockStructurer     *models.MockStructurer
 }
 
 func NewApp(db *sql.DB, photoDir string) *App {
@@ -37,6 +38,7 @@ func NewApp(db *sql.DB, photoDir string) *App {
 		itinerariesService: models.NewItinerariesService(db),
 		aiService:          models.NewAIServiceService(db),
 		mockWebSearcher:    &models.MockWebSearcher{},
+		mockStructurer:     &models.MockStructurer{},
 	}
 }
 
@@ -235,11 +237,43 @@ func (a *App) DeleteItineraryById(itineraryId int64) error {
 }
 
 // AI
-
-func (a *App) GetWebSearchTrip() (models.WebSearchResult, error) {
-	data, err := a.aiService.SearchWeb(a.mockWebSearcher)
+func (a *App) GenerateAITripPlan() (int64, error) {
+	data, err := a.aiService.SearchWeb(a.mockWebSearcher, models.TripAIRequest{})
 	if err != nil {
-		return models.WebSearchResult{}, err
+		return 0, fmt.Errorf("Error querying LLM on web search: %v", err)
 	}
-	return data, nil
+
+	structured, err := a.aiService.StructureWebResult(a.mockStructurer, data)
+	if err != nil {
+		return 0, fmt.Errorf("Error structuring web search result: %v", err)
+	}
+	tripId, err := a.CreateTrip(structured.Trip)
+	if err != nil {
+		return 0, err
+	}
+	for _, expenseInput := range structured.Expenses {
+		_, err = a.CreateExpenseByTripId(tripId, expenseInput)
+		if err != nil {
+			return 0, err
+		}
+	}
+	for _, noteInput := range structured.Notes {
+		_, err = a.CreateNoteByTripId(tripId, noteInput)
+		if err != nil {
+			return 0, err
+		}
+	}
+	for _, linkInput := range structured.Links {
+		_, err = a.CreateLinkByTripId(tripId, linkInput)
+		if err != nil {
+			return 0, err
+		}
+	}
+	for _, itinInput := range structured.Itinerary {
+		_, err = a.CreateItineraryByTripId(tripId, itinInput)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return tripId, nil
 }

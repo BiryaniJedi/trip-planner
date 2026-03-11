@@ -54,6 +54,10 @@ export function DeleteTripById(arg1) {
   return window['go']['main']['App']['DeleteTripById'](arg1);
 }
 
+export function GenerateAITripPlan() {
+  return window['go']['main']['App']['GenerateAITripPlan']();
+}
+
 export function GetAllTrips() {
   return window['go']['main']['App']['GetAllTrips']();
 }
@@ -104,10 +108,6 @@ export function GetPhotosByTripId(arg1) {
 
 export function GetTripByID(arg1) {
   return window['go']['main']['App']['GetTripByID'](arg1);
-}
-
-export function GetWebSearchTrip() {
-  return window['go']['main']['App']['GetWebSearchTrip']();
 }
 
 export function PickPhotoFile() {
