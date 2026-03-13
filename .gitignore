@@ -33,3 +33,5 @@ build/
 
 AI_FEATURE_COURSE.md
 AI_SEARCH_GUIDE.md
+
+.claude/*

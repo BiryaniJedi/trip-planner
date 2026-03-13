@@ -3,6 +3,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CreateTrip, GetTripByID, UpdateTripById } from '../../wailsjs/go/main/App';
 import { TYPE_LABELS } from '../utils';
 
+function PageSpinner() {
+	return (
+		<div className="h-full flex items-center justify-center">
+			<div className="flex flex-col items-center gap-3">
+				<div className="w-8 h-8 rounded-full border-2 border-[var(--c-border)] border-t-[var(--c-p6)] animate-spin" />
+				<p className="text-sm text-[var(--c-muted)]">Loading…</p>
+			</div>
+		</div>
+	);
+}
+
 export default function TripForm() {
 	const { id } = useParams();
 	const tripId = id ? parseInt(id) : null;
@@ -46,14 +57,7 @@ export default function TripForm() {
 			return;
 		}
 		setLoading(true);
-		const input = {
-			name,
-			destination: dest,
-			start_date: start,
-			end_date: end,
-			trip_type: tripType,
-			need_visa: needVisa,
-		};
+		const input = { name, destination: dest, start_date: start, end_date: end, trip_type: tripType, need_visa: needVisa };
 		try {
 			if (isEdit) {
 				await UpdateTripById(tripId, input);
@@ -69,25 +73,19 @@ export default function TripForm() {
 		}
 	};
 
-	const labelClass = 'block text-sm font-medium text-slate-600 mb-1';
+	const labelClass = 'block text-sm font-medium text-[var(--c-text2)] mb-1';
 	const inputClass =
-		'w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition';
+		'w-full border border-[var(--c-border)] rounded-xl px-3 py-2 text-sm text-[var(--c-text)] bg-[var(--c-card)] focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition placeholder:text-[var(--c-muted)]';
 
-	if (initLoading) {
-		return (
-			<div className="h-full flex items-center justify-center">
-				<p className="text-slate-400 text-lg">Loading…</p>
-			</div>
-		);
-	}
+	if (initLoading) return <PageSpinner />;
 
 	return (
-		<div className="min-h-full bg-slate-50 flex items-start justify-center px-6 py-12">
-			<div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-				<h1 className="text-2xl font-bold text-slate-800 mb-6">{isEdit ? 'Edit Trip' : 'New Trip'}</h1>
+		<div className="min-h-full bg-[var(--c-bg)] flex items-start justify-center px-6 py-12 page-in">
+			<div className="w-full max-w-md bg-[var(--c-card)] rounded-2xl border border-[var(--c-border)] shadow-sm p-8">
+				<h1 className="text-2xl font-bold text-[var(--c-text)] mb-6">{isEdit ? 'Edit Trip' : 'New Trip'}</h1>
 
 				{error && (
-					<div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+					<div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
 						{error}
 					</div>
 				)}
@@ -154,16 +152,17 @@ export default function TripForm() {
 							type="checkbox"
 							checked={needVisa}
 							onChange={(e) => setNeedVisa(e.target.checked)}
-							className="w-4 h-4 rounded border-slate-300" style={{ accentColor: 'var(--c-p6)' }}
+							className="w-4 h-4 rounded border-[var(--c-border2)]"
+							style={{ accentColor: 'var(--c-p6)' }}
 						/>
-						<span className="text-sm text-slate-600">Visa required</span>
+						<span className="text-sm text-[var(--c-text2)]">Visa required</span>
 					</label>
 				</div>
 
 				<div className="flex gap-3 mt-8">
 					<button
 						onClick={() => navigate(-1)}
-						className="flex-1 text-sm font-medium text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 py-2.5 rounded-xl transition-colors cursor-pointer"
+						className="flex-1 text-sm font-medium text-[var(--c-text2)] border border-[var(--c-border)] hover:border-[var(--c-border2)] hover:bg-[var(--c-hover)] py-2.5 rounded-xl transition-colors cursor-pointer"
 					>
 						Cancel
 					</button>

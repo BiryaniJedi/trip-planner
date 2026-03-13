@@ -11,12 +11,23 @@ import { CATEGORY_ICONS, CATEGORY_LABELS, CURRENCIES, formatCents, parseCents } 
 
 const CATEGORIES = ['flight', 'hotel', 'car', 'festival', 'food', 'activity', 'other'];
 
+function PageSpinner() {
+	return (
+		<div className="h-full flex items-center justify-center">
+			<div className="flex flex-col items-center gap-3">
+				<div className="w-8 h-8 rounded-full border-2 border-[var(--c-border)] border-t-[var(--c-p6)] animate-spin" />
+				<p className="text-sm text-[var(--c-muted)]">Loading…</p>
+			</div>
+		</div>
+	);
+}
+
 const inputCls =
-	'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition';
+	'w-full border border-[var(--c-border)] rounded-lg px-3 py-2 text-sm text-[var(--c-text)] bg-[var(--c-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--c-p3)] focus:border-[var(--c-p4)] transition placeholder:text-[var(--c-muted)]';
 const btnPrimary =
 	'text-sm font-medium bg-[var(--c-p6)] hover:bg-[var(--c-p7)] text-white px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50';
 const btnSecondary =
-	'text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg transition-colors cursor-pointer';
+	'text-sm font-medium border border-[var(--c-border)] text-[var(--c-text2)] hover:bg-[var(--c-hover)] px-4 py-2 rounded-lg transition-colors cursor-pointer';
 
 function AmountInput({ value, onChange, currency, onCurrencyChange }) {
 	return (
@@ -46,24 +57,18 @@ function ExpenseForm({ initial, onSave, onCancel, saving }) {
 
 	const handleSave = () => {
 		if (!name.trim()) return;
-		onSave({
-			name: name.trim(),
-			category,
-			amount: parseCents(amountStr),
-			currency,
-			note: note.trim(),
-		});
+		onSave({ name: name.trim(), category, amount: parseCents(amountStr), currency, note: note.trim() });
 	};
 
 	return (
-		<div className="flex flex-col gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+		<div className="flex flex-col gap-3 p-4 bg-[var(--c-hover)] border border-[var(--c-border)] rounded-xl">
 			<div className="grid grid-cols-2 gap-3">
 				<div className="flex flex-col gap-1">
-					<label className="text-xs font-medium text-slate-500">Name *</label>
+					<label className="text-xs font-medium text-[var(--c-muted)]">Name *</label>
 					<input type="text" placeholder="e.g. Flight to Paris" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
 				</div>
 				<div className="flex flex-col gap-1">
-					<label className="text-xs font-medium text-slate-500">Category</label>
+					<label className="text-xs font-medium text-[var(--c-muted)]">Category</label>
 					<select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
 						{CATEGORIES.map((c) => (
 							<option key={c} value={c}>{CATEGORY_ICONS[c]} {CATEGORY_LABELS[c]}</option>
@@ -72,11 +77,11 @@ function ExpenseForm({ initial, onSave, onCancel, saving }) {
 				</div>
 			</div>
 			<div className="flex flex-col gap-1">
-				<label className="text-xs font-medium text-slate-500">Amount</label>
+				<label className="text-xs font-medium text-[var(--c-muted)]">Amount</label>
 				<AmountInput value={amountStr} onChange={setAmountStr} currency={currency} onCurrencyChange={setCurrency} />
 			</div>
 			<div className="flex flex-col gap-1">
-				<label className="text-xs font-medium text-slate-500">Note (optional)</label>
+				<label className="text-xs font-medium text-[var(--c-muted)]">Note (optional)</label>
 				<input type="text" placeholder="Any extra detail…" value={note} onChange={(e) => setNote(e.target.value)} className={inputCls} />
 			</div>
 			<div className="flex gap-2 justify-end pt-1">
@@ -164,19 +169,12 @@ export default function Expenses() {
 		}
 	};
 
-	// Totals per currency
 	const totals = expenses.reduce((acc, e) => {
 		acc[e.currency] = (acc[e.currency] || 0) + e.amount;
 		return acc;
 	}, {});
 
-	if (loading) {
-		return (
-			<div className="h-full flex items-center justify-center">
-				<p className="text-slate-400 text-lg">Loading…</p>
-			</div>
-		);
-	}
+	if (loading) return <PageSpinner />;
 
 	if (error) {
 		return (
@@ -188,19 +186,19 @@ export default function Expenses() {
 	}
 
 	return (
-		<div className="min-h-full bg-slate-50 px-6 py-8">
-			<div className="max-w-2xl mx-auto flex flex-col gap-5">
+		<div className="min-h-full bg-[var(--c-bg)] px-6 py-8 page-in">
+			<div className="max-w-3xl mx-auto flex flex-col gap-5">
 
 				{/* Header */}
 				<div className="flex items-center justify-between">
 					<div>
 						<button
 							onClick={() => navigate(`/trips/${tripId}`)}
-							className="text-slate-400 hover:text-slate-600 text-sm mb-1 flex items-center gap-1 cursor-pointer"
+							className="text-[var(--c-muted)] hover:text-[var(--c-text2)] text-sm mb-1 flex items-center gap-1 cursor-pointer transition-colors"
 						>
 							← {trip?.name ?? 'Trip'}
 						</button>
-						<h1 className="text-3xl font-bold text-slate-800">Expenses</h1>
+						<h1 className="text-3xl font-bold text-[var(--c-text)]">Expenses</h1>
 					</div>
 					<button
 						onClick={() => { setShowAddForm(true); setEditingId(null); }}
@@ -212,19 +210,15 @@ export default function Expenses() {
 
 				{/* Add form */}
 				{showAddForm && (
-					<ExpenseForm
-						onSave={handleAdd}
-						onCancel={() => setShowAddForm(false)}
-						saving={addSaving}
-					/>
+					<ExpenseForm onSave={handleAdd} onCancel={() => setShowAddForm(false)} saving={addSaving} />
 				)}
 
 				{/* Expense list */}
 				{expenses.length === 0 && !showAddForm ? (
-					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 text-center">
+					<div className="bg-[var(--c-card)] rounded-2xl border border-[var(--c-border)] shadow-sm p-10 text-center">
 						<p className="text-4xl mb-3">💸</p>
-						<p className="text-slate-500 font-medium">No expenses yet.</p>
-						<p className="text-slate-400 text-sm mt-1">Hit "+ Add Expense" to start tracking.</p>
+						<p className="text-[var(--c-text2)] font-medium">No expenses yet.</p>
+						<p className="text-[var(--c-muted)] text-sm mt-1">Hit "+ Add Expense" to start tracking.</p>
 					</div>
 				) : (
 					<div className="flex flex-col gap-3">
@@ -238,10 +232,10 @@ export default function Expenses() {
 									saving={editSaving}
 								/>
 							) : (
-								<div key={expense.id} className="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-3">
+								<div key={expense.id} className="bg-[var(--c-card)] rounded-xl border border-[var(--c-border)] shadow-sm px-4 py-3">
 									{confirmDeleteId === expense.id ? (
 										<div className="flex items-center justify-between">
-											<p className="text-sm text-red-600 font-medium">Delete this expense?</p>
+											<p className="text-sm text-red-600 dark:text-red-400 font-medium">Delete this expense?</p>
 											<div className="flex gap-2">
 												<button onClick={() => setConfirmDeleteId(null)} className={btnSecondary} style={{ padding: '4px 12px' }}>Cancel</button>
 												<button
@@ -256,17 +250,17 @@ export default function Expenses() {
 										<div className="flex items-center gap-3">
 											<span className="text-2xl shrink-0">{CATEGORY_ICONS[expense.category] ?? '📦'}</span>
 											<div className="flex-1 min-w-0">
-												<p className="text-sm font-semibold text-slate-800">{expense.name}</p>
-												{expense.note && <p className="text-xs text-slate-400 mt-0.5 truncate">{expense.note}</p>}
+												<p className="text-sm font-semibold text-[var(--c-text)]">{expense.name}</p>
+												{expense.note && <p className="text-xs text-[var(--c-muted)] mt-0.5 truncate">{expense.note}</p>}
 											</div>
 											<div className="text-right shrink-0">
-												<p className="text-base font-bold text-slate-800">{formatCents(expense.amount, expense.currency)}</p>
-												<p className="text-xs text-slate-400">{CATEGORY_LABELS[expense.category]}</p>
+												<p className="text-base font-bold text-[var(--c-text)]">{formatCents(expense.amount, expense.currency)}</p>
+												<p className="text-xs text-[var(--c-muted)]">{CATEGORY_LABELS[expense.category]}</p>
 											</div>
 											<div className="flex gap-2 ml-2 shrink-0">
 												<button
 													onClick={() => { setEditingId(expense.id); setShowAddForm(false); }}
-													className="text-xs text-slate-400 hover:text-slate-600 cursor-pointer transition-colors"
+													className="text-xs text-[var(--c-muted)] hover:text-[var(--c-text2)] cursor-pointer transition-colors"
 												>
 													Edit
 												</button>
@@ -287,13 +281,13 @@ export default function Expenses() {
 
 				{/* Totals footer */}
 				{expenses.length > 0 && (
-					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-						<p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Total Spent</p>
+					<div className="bg-[var(--c-card)] rounded-2xl border border-[var(--c-border)] shadow-sm p-5">
+						<p className="text-xs font-semibold text-[var(--c-muted)] uppercase tracking-wide mb-3">Total Spent</p>
 						<div className="flex flex-wrap gap-6">
 							{Object.entries(totals).map(([currency, total]) => (
 								<div key={currency}>
-									<p className="text-2xl font-bold text-slate-800">{formatCents(total, currency)}</p>
-									<p className="text-xs text-slate-400">{currency}</p>
+									<p className="text-2xl font-bold text-[var(--c-text)]">{formatCents(total, currency)}</p>
+									<p className="text-xs text-[var(--c-muted)]">{currency}</p>
 								</div>
 							))}
 						</div>

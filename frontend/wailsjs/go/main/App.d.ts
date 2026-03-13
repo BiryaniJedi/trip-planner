@@ -28,7 +28,7 @@ export function DeletePhotoById(arg1:number):Promise<void>;
 
 export function DeleteTripById(arg1:number):Promise<void>;
 
-export function GenerateAITripPlan():Promise<number>;
+export function GenerateAITripPlan(arg1:models.TripAIRequest):Promise<number>;
 
 export function GetAllTrips():Promise<Array<models.Trip>>;
 

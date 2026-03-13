@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function LoadingSpinner({ messages }) {
+export default function LoadingSpinner({ messages }: { messages: string[] }) {
 	const [msgIndex, setMsgIndex] = useState(0);
 
 	useEffect(() => {
@@ -11,9 +11,11 @@ export default function LoadingSpinner({ messages }) {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-6">
-			<div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-slate-600 animate-spin" />
-			<p className="text-slate-500 text-sm font-medium transition-all">{messages[msgIndex]}</p>
+		<div className="flex flex-col items-center gap-10">
+			<div className="w-20 h-20 rounded-full border-[3px] border-white/20 border-t-white animate-spin" />
+			<div className="w-72 text-center">
+				<p className="text-white text-lg font-light tracking-widest">{messages[msgIndex]}</p>
+			</div>
 		</div>
 	);
 }

@@ -15,7 +15,18 @@ const btnPrimary =
 const btnSecondary =
 	'text-sm font-medium border border-[var(--c-border)] text-[var(--c-text2)] hover:bg-[var(--c-hover)] px-4 py-2 rounded-lg transition-colors cursor-pointer';
 const btnSmDanger = 'text-xs text-red-400 hover:text-red-600 cursor-pointer transition-colors';
-const btnSmGhost  = 'text-xs text-slate-400 hover:text-slate-600 cursor-pointer transition-colors';
+const btnSmGhost  = 'text-xs text-[var(--c-muted)] hover:text-[var(--c-text2)] cursor-pointer transition-colors';
+
+function PageSpinner() {
+	return (
+		<div className="h-full flex items-center justify-center">
+			<div className="flex flex-col items-center gap-3">
+				<div className="w-8 h-8 rounded-full border-2 border-[var(--c-border)] border-t-[var(--c-p6)] animate-spin" />
+				<p className="text-sm text-[var(--c-muted)]">Loading…</p>
+			</div>
+		</div>
+	);
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -182,13 +193,7 @@ export default function TripItinerary() {
 		);
 	}
 
-	if (loading) {
-		return (
-			<div className="h-full flex items-center justify-center">
-				<p className="text-slate-400 text-lg">Loading…</p>
-			</div>
-		);
-	}
+	if (loading) return <PageSpinner />;
 
 	// ── Group and sort ────────────────────────────────────────────────────────
 
@@ -198,8 +203,8 @@ export default function TripItinerary() {
 	// ── Render ────────────────────────────────────────────────────────────────
 
 	return (
-		<div className="min-h-full bg-[var(--c-bg)] px-6 py-8">
-			<div className="max-w-2xl mx-auto flex flex-col gap-6">
+		<div className="min-h-full bg-[var(--c-bg)] px-6 py-8 page-in">
+			<div className="max-w-3xl mx-auto flex flex-col gap-6">
 
 				{/* ── Header ── */}
 				<div className="flex items-center justify-between">

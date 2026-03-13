@@ -54,8 +54,8 @@ export function DeleteTripById(arg1) {
   return window['go']['main']['App']['DeleteTripById'](arg1);
 }
 
-export function GenerateAITripPlan() {
-  return window['go']['main']['App']['GenerateAITripPlan']();
+export function GenerateAITripPlan(arg1) {
+  return window['go']['main']['App']['GenerateAITripPlan'](arg1);
 }
 
 export function GetAllTrips() {

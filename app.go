@@ -251,7 +251,7 @@ func (a *App) DeleteItineraryById(itineraryId int64) error {
 }
 
 // AI
-func (a *App) GenerateAITripPlan() (int64, error) {
+func (a *App) GenerateAITripPlan(req models.TripAIRequest) (int64, error) {
 	var apiKey string
 
 	useRealAI := os.Getenv("USE_REAL_AI") == "true"
@@ -260,23 +260,6 @@ func (a *App) GenerateAITripPlan() (int64, error) {
 		if apiKey == "" {
 			return 0, fmt.Errorf("OPENAI_API_KEY not set")
 		}
-	}
-
-	//hardcoded for now
-	req := models.TripAIRequest{
-		TripName:        "Tokyo Spring Adventure",
-		Destination:     "Tokyo, Japan",
-		StartingAirport: "JFK",
-		DurationDays:    10,
-		Month:           "April",
-		Year:            2026,
-		TravelerCount:   2,
-		TravelerType:    "couple",
-		Budget:          "$5000 total",
-		Interests:       []string{"food", "anime", "hiking", "temples"},
-		DietaryNeeds:    "no restrictions",
-		Mobility:        "no restrictions",
-		PassportCountry: "US",
 	}
 	data, err := a.aiService.SearchWeb(a.ctx, a.webSearcher, req, useRealAI, apiKey)
 	if err != nil {

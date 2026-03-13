@@ -190,6 +190,42 @@ export namespace models {
 	        this.need_visa = source["need_visa"];
 	    }
 	}
+	export class TripAIRequest {
+	    TripName: string;
+	    Destination: string;
+	    StartingAirport: string;
+	    DurationDays: number;
+	    Month: string;
+	    Year: number;
+	    TravelerCount: number;
+	    TravelerType: string;
+	    Budget: string;
+	    Interests: string[];
+	    DietaryNeeds: string;
+	    Mobility: string;
+	    PassportCountry: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TripAIRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.TripName = source["TripName"];
+	        this.Destination = source["Destination"];
+	        this.StartingAirport = source["StartingAirport"];
+	        this.DurationDays = source["DurationDays"];
+	        this.Month = source["Month"];
+	        this.Year = source["Year"];
+	        this.TravelerCount = source["TravelerCount"];
+	        this.TravelerType = source["TravelerType"];
+	        this.Budget = source["Budget"];
+	        this.Interests = source["Interests"];
+	        this.DietaryNeeds = source["DietaryNeeds"];
+	        this.Mobility = source["Mobility"];
+	        this.PassportCountry = source["PassportCountry"];
+	    }
+	}
 	export class TripInput {
 	    name: string;
 	    destination: string;

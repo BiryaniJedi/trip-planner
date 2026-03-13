@@ -3,34 +3,67 @@
 /* Class-based dark mode: dark: variant activates when any ancestor has .dark */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ── Base ───────────────────────────────────────────────────────────────── */
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Custom scrollbars ──────────────────────────────────────────────────── */
+::-webkit-scrollbar             { width: 5px; height: 5px; }
+::-webkit-scrollbar-track       { background: transparent; }
+::-webkit-scrollbar-thumb       { background-color: var(--c-border2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--c-muted); }
+::-webkit-scrollbar-corner      { background: transparent; }
+
+/* ── Text selection ─────────────────────────────────────────────────────── */
+::selection { background-color: var(--c-p2); color: var(--c-p8); }
+
+/* ── Page enter animation ───────────────────────────────────────────────── */
+@keyframes page-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+.page-in { animation: page-in 0.2s ease forwards; }
+
+/* ── Smooth theme/dark-mode transitions (only surfaces, not text) ───────── */
+.bg-transition,
+.bg-transition * {
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
 /* ── Surface / neutral vars ─────────────────────────────────────────────── */
 :root {
 	color-scheme: light;
-	--c-bg:      #f8fafc; /* slate-50  – page background           */
-	--c-card:    #ffffff; /* white     – card / panel              */
-	--c-border:  #e2e8f0; /* slate-200 – primary border            */
-	--c-border2: #cbd5e1; /* slate-300 – secondary / hover border  */
-	--c-text:    #1e293b; /* slate-800 – primary text              */
-	--c-text2:   #475569; /* slate-600 – secondary text            */
-	--c-text3:   #64748b; /* slate-500 – tertiary text             */
-	--c-muted:   #94a3b8; /* slate-400 – muted / placeholder text  */
-	--c-hover:   #f1f5f9; /* slate-100 – hover background          */
+	--c-bg:      #f8fafc;
+	--c-card:    #ffffff;
+	--c-border:  #e2e8f0;
+	--c-border2: #cbd5e1;
+	--c-text:    #1e293b;
+	--c-text2:   #475569;
+	--c-text3:   #64748b;
+	--c-muted:   #94a3b8;
+	--c-hover:   #f1f5f9;
 }
 
 .dark {
 	color-scheme: dark;
-	--c-bg:      #0f172a; /* slate-950 */
-	--c-card:    #1e293b; /* slate-800 */
-	--c-border:  #334155; /* slate-700 */
-	--c-border2: #475569; /* slate-600 */
-	--c-text:    #f1f5f9; /* slate-100 */
-	--c-text2:   #cbd5e1; /* slate-300 */
-	--c-text3:   #94a3b8; /* slate-400 */
-	--c-muted:   #64748b; /* slate-500 */
-	--c-hover:   #334155; /* slate-700 */
+	--c-bg:      #0f172a;
+	--c-card:    #1e293b;
+	--c-border:  #334155;
+	--c-border2: #475569;
+	--c-text:    #f1f5f9;
+	--c-text2:   #cbd5e1;
+	--c-text3:   #94a3b8;
+	--c-muted:   #64748b;
+	--c-hover:   #334155;
 }
 
-/* ── Accent vars (indigo default) – overridden at runtime by ThemeContext ── */
+/* ── Accent vars (indigo default – overridden at runtime by ThemeContext) ── */
 :root {
 	--c-p1: #e0e7ff;
 	--c-p2: #c7d2fe;
