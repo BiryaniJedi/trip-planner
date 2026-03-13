@@ -1,8 +1,10 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+
 	_ "modernc.org/sqlite"
 )
 
@@ -35,13 +37,13 @@ type WebSearchResult struct {
 // WebSearcher is implemented by anything that can run Pass 1.
 // Concrete type: OpenAIWebSearcher. Mock type: MockWebSearcher.
 type WebSearcher interface {
-	Search(req TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error)
+	Search(ctx context.Context, request TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error)
 }
 
 // Structurer is implemented by anything that can run Pass 2.
 // Concrete type: OpenAIStructurer. Mock type: MockStructurer.
 type Structurer interface {
-	GenerateTripPlan(research WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error)
+	GenerateTripPlan(ctx context.Context, research WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error)
 }
 
 // ── Request types ──────────────────────────────────────────────
@@ -107,13 +109,13 @@ func NewAIServiceService(database *sql.DB) *AIService {
 	return &AIService{database}
 }
 
-func (as *AIService) SearchWeb(searcher WebSearcher, tripAIInput TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
+func (as *AIService) SearchWeb(ctx context.Context, searcher WebSearcher, tripAIInput TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
 	if !useRealAI {
 		mockSearcher, ok := searcher.(*MockWebSearcher)
 		if !ok {
 			return WebSearchResult{}, fmt.Errorf("searcher is not a MockWebSearcher, got=%T\n", searcher)
 		}
-		res, err := mockSearcher.Search(tripAIInput, useRealAI, apiKey)
+		res, err := mockSearcher.Search(ctx, tripAIInput, useRealAI, apiKey)
 		if err != nil {
 			return WebSearchResult{}, err
 		}
@@ -121,16 +123,24 @@ func (as *AIService) SearchWeb(searcher WebSearcher, tripAIInput TripAIRequest, 
 	}
 
 	// TODO real AI search here
-	return WebSearchResult{}, nil
+	openAISearcher, ok := searcher.(*OpenAIWebSearcher)
+	if !ok {
+		return WebSearchResult{}, fmt.Errorf("searcher is not an OpenAIWebSearcher, got=%t\n", searcher)
+	}
+	res, err := openAISearcher.Search(ctx, tripAIInput, useRealAI, apiKey)
+	if err != nil {
+		return WebSearchResult{}, err
+	}
+	return res, nil
 }
 
-func (as *AIService) StructureWebResult(structurer Structurer, result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
+func (as *AIService) StructureWebResult(ctx context.Context, structurer Structurer, result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
 	if !useRealAI {
 		mockStructurer, ok := structurer.(*MockStructurer)
 		if !ok {
 			return AITripPlan{}, fmt.Errorf("structurer is not a MockStructurer, got=%T\n", structurer)
 		}
-		structured, err := mockStructurer.GenerateTripPlan(result, useRealAI, apiKey)
+		structured, err := mockStructurer.GenerateTripPlan(ctx, result, useRealAI, apiKey)
 		if err != nil {
 			return AITripPlan{}, fmt.Errorf("Error structuring web search result: %v", err)
 		}

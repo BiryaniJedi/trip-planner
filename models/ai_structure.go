@@ -6,14 +6,19 @@ import (
 	"github.com/invopop/jsonschema"
 )
 
-func generateSchema[T any]() interface{} {
+func generateSchema[T any]() map[string]any {
 	reflector := jsonschema.Reflector{
 		AllowAdditionalProperties: false, // CRITICAL — must be false for Structured Outputs
 		DoNotReference:            true,  // CRITICAL — inlines all $defs, required by OpenAI
 	}
 	var v T
-	return reflector.Reflect(v)
+	schema := reflector.Reflect(v)
+	b, _ := json.Marshal(schema)
+	var m map[string]any
+	json.Unmarshal(b, &m)
+	return m
 }
+
 func PrintAITripPlanSchema() {
 	pretty, err := json.MarshalIndent(AITripPlanSchema, "", "  ")
 	if err != nil {

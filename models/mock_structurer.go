@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"strings"
 )
@@ -37,7 +38,7 @@ type MockStructurer struct{}
 //		Notes     []NoteInput      `json:"notes"`
 //		Itinerary []ItineraryInput `json:"itinerary"`
 //	}
-func (m *MockStructurer) GenerateTripPlan(result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
+func (m *MockStructurer) GenerateTripPlan(ctx context.Context, result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
 	if strings.TrimSpace(result.RawText) == "" {
 		return AITripPlan{}, fmt.Errorf("result.RawText cannot be empty")
 	}

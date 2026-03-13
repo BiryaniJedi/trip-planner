@@ -1,13 +1,13 @@
 package models
 
-import (
+import "context"
+
 // "math/rand"
 // "time"
-)
 
 type MockWebSearcher struct{}
 
-func (m *MockWebSearcher) Search(req TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
+func (m *MockWebSearcher) Search(ctx context.Context, request TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
 	// delay := time.Duration(2+rand.Intn(6)) * time.Second
 	// time.Sleep(delay)
 	return WebSearchResult{

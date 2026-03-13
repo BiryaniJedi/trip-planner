@@ -30,6 +30,7 @@ type App struct {
 
 func NewApp(db *sql.DB, photoDir string) *App {
 	useRealAI := os.Getenv("USE_REAL_AI") == "true"
+	models.PrintAITripPlanSchema()
 
 	var (
 		webSearcherToSet models.WebSearcher
@@ -261,12 +262,30 @@ func (a *App) GenerateAITripPlan() (int64, error) {
 			return 0, fmt.Errorf("OPENAI_API_KEY not set")
 		}
 	}
-	data, err := a.aiService.SearchWeb(a.webSearcher, models.TripAIRequest{}, useRealAI, apiKey)
+
+	//hardcoded for now
+	req := models.TripAIRequest{
+		TripName:        "Tokyo Spring Adventure",
+		Destination:     "Tokyo, Japan",
+		StartingAirport: "JFK",
+		DurationDays:    10,
+		Month:           "April",
+		Year:            2026,
+		TravelerCount:   2,
+		TravelerType:    "couple",
+		Budget:          "$5000 total",
+		Interests:       []string{"food", "anime", "hiking", "temples"},
+		DietaryNeeds:    "no restrictions",
+		Mobility:        "no restrictions",
+		PassportCountry: "US",
+	}
+
+	data, err := a.aiService.SearchWeb(a.ctx, a.webSearcher, req, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error querying LLM on web search: %v", err)
 	}
 
-	structured, err := a.aiService.StructureWebResult(a.structurer, data, useRealAI, apiKey)
+	structured, err := a.aiService.StructureWebResult(a.ctx, a.structurer, data, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error structuring web search result: %v", err)
 	}

@@ -10,7 +10,7 @@ var _ Structurer = (*MockStructurer)(nil)
 
 func TestMockWebSearcherReturnsNonEmptyText(t *testing.T) {
 	s := &MockWebSearcher{}
-	webSearch, err := s.Search(TripAIRequest{})
+	webSearch, err := s.Search(TripAIRequest{}, false, "")
 	if err != nil {
 		t.Fatalf("Error calling mock web searcher Search: %v", err)
 	}
@@ -24,7 +24,7 @@ func TestMockWebSearcherReturnsNonEmptyText(t *testing.T) {
 
 func TestMockStructurerRejectsEmptyResearch(t *testing.T) {
 	s := &MockStructurer{}
-	_, err := s.GenerateTripPlan(WebSearchResult{RawText: ""})
+	_, err := s.GenerateTripPlan(WebSearchResult{RawText: ""}, false, "")
 	if err == nil {
 		t.Error("expected error when RawText is empty, got nil")
 	}
@@ -35,8 +35,8 @@ func TestMockStructurerLinksIncludeSearchSources(t *testing.T) {
 	searcher := &MockWebSearcher{}
 	structurer := &MockStructurer{}
 
-	research, _ := searcher.Search(TripAIRequest{})
-	plan, _ := structurer.GenerateTripPlan(research)
+	research, _ := searcher.Search(TripAIRequest{}, false, "")
+	plan, _ := structurer.GenerateTripPlan(research, false, "")
 
 	// At least one link URL should come from research.Sources
 	sourceSet := make(map[string]bool)
@@ -53,19 +53,4 @@ func TestMockStructurerLinksIncludeSearchSources(t *testing.T) {
 	if !found {
 		t.Error("expected at least one plan Link to come from research.Sources")
 	}
-}
-
-func aiTripPlanNotEmpty(plan AITripPlan) bool {
-	tripInput := plan.Trip
-	expenseInputs := plan.Expenses
-	noteInputs := plan.Notes
-	linkInputs := plan.Links
-	itinInputs := plan.Itinerary
-	if tripInput.Name == "" {
-		return false
-	}
-	if len(expenseInputs) == 0 || len(noteInputs) == 0 || len(linkInputs) == 0 || len(itinInputs) == 0 {
-		return false
-	}
-	return true
 }
