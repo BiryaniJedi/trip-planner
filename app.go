@@ -30,7 +30,6 @@ type App struct {
 
 func NewApp(db *sql.DB, photoDir string) *App {
 	useRealAI := os.Getenv("USE_REAL_AI") == "true"
-	models.PrintAITripPlanSchema()
 
 	var (
 		webSearcherToSet models.WebSearcher
@@ -279,7 +278,6 @@ func (a *App) GenerateAITripPlan() (int64, error) {
 		Mobility:        "no restrictions",
 		PassportCountry: "US",
 	}
-
 	data, err := a.aiService.SearchWeb(a.ctx, a.webSearcher, req, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error querying LLM on web search: %v", err)

@@ -148,5 +148,13 @@ func (as *AIService) StructureWebResult(ctx context.Context, structurer Structur
 	}
 
 	// TODO real structurer here
-	return AITripPlan{}, nil
+	openAIStructurer, ok := structurer.(*OpenAIStructurer)
+	if !ok {
+		return AITripPlan{}, fmt.Errorf("structurer is not an OpenAIStructurer, got=%t\n", structurer)
+	}
+	res, err := openAIStructurer.GenerateTripPlan(ctx, result, useRealAI, apiKey)
+	if err != nil {
+		return AITripPlan{}, err
+	}
+	return res, nil
 }

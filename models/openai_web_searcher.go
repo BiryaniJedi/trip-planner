@@ -6,7 +6,6 @@ import (
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
-	"os"
 	"strings"
 )
 
@@ -30,10 +29,10 @@ func (ow *OpenAIWebSearcher) Search(ctx context.Context, req TripAIRequest, useR
 		// 		},
 		// 	},
 		// },
-		// MaxToolCalls:    openai.Int(1),
+		MaxToolCalls:    openai.Int(1),
 		MaxOutputTokens: openai.Int(4000),
 		Input: responses.ResponseNewParamsInputUnion{
-			OfString: openai.String(buildPrompt(req)),
+			OfString: openai.String(ow.buildPrompt(req)),
 		},
 		// ToolChoice: responses.ResponseNewParamsToolChoiceUnion{
 		// 	OfHostedTool: &responses.ToolChoiceTypesParam{
@@ -49,10 +48,6 @@ func (ow *OpenAIWebSearcher) Search(ctx context.Context, req TripAIRequest, useR
 
 	fmt.Println(webSearchResult.RawText)
 	fmt.Printf("Total token usage: %d\n", resp.Usage.TotalTokens)
-	fmt.Println()
-	f, _ := os.OpenFile("debug_raw.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
-	fmt.Fprintln(f, webSearchResult.RawText)
 
 	return webSearchResult, nil
 }
@@ -72,7 +67,7 @@ func (ow *OpenAIWebSearcher) Search(ctx context.Context, req TripAIRequest, useR
 //		Mobility        string
 //		PassportCountry string
 //	}
-func buildPrompt(req TripAIRequest) string {
+func (ow *OpenAIWebSearcher) buildPrompt(req TripAIRequest) string {
 	var sb strings.Builder
 
 	// Role + task
@@ -106,7 +101,7 @@ func buildPrompt(req TripAIRequest) string {
 	sb.WriteString("- Restaurant recommendations with a short description of each\n")
 	sb.WriteString("- Estimated expenses broken down by category (flights, hotels, food, activities)\n")
 	sb.WriteString("- Visa requirements for the given passport\n")
-	sb.WriteString("- Useful links for booking and research\n")
+	sb.WriteString("- Useful links for booking and research, and any and all links you searched through, including a specific google flights search if applicable.\n")
 	sb.WriteString("- Any important travel tips or warnings\n")
 	sb.WriteString("- Reasonably structured output in markdown format, with sections for Notes, Expenses, Links, and the Itinerary")
 
