@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,6 +18,10 @@ import (
 var assets embed.FS
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("no .env found")
+	}
+
 	database, err := db.Init()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)

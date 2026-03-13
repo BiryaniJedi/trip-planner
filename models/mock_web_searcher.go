@@ -1,15 +1,15 @@
 package models
 
 import (
-	"math/rand"
-	"time"
+// "math/rand"
+// "time"
 )
 
 type MockWebSearcher struct{}
 
-func (m *MockWebSearcher) Search(req TripAIRequest) (WebSearchResult, error) {
-	delay := time.Duration(5+rand.Intn(6)) * time.Second
-	time.Sleep(delay)
+func (m *MockWebSearcher) Search(req TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
+	// delay := time.Duration(2+rand.Intn(6)) * time.Second
+	// time.Sleep(delay)
 	return WebSearchResult{
 		RawText: `
 # Trip Research: Mumbai, India

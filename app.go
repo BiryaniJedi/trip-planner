@@ -24,11 +24,25 @@ type App struct {
 	photosService      *models.PhotosService
 	itinerariesService *models.ItinerariesService
 	aiService          *models.AIService
-	mockWebSearcher    *models.MockWebSearcher
-	mockStructurer     *models.MockStructurer
+	webSearcher        models.WebSearcher
+	structurer         models.Structurer
 }
 
 func NewApp(db *sql.DB, photoDir string) *App {
+	useRealAI := os.Getenv("USE_REAL_AI") == "true"
+
+	var (
+		webSearcherToSet models.WebSearcher
+		structurerToSet  models.Structurer
+	)
+	if !useRealAI {
+		webSearcherToSet = &models.MockWebSearcher{}
+		structurerToSet = &models.MockStructurer{}
+	} else {
+		webSearcherToSet = &models.OpenAIWebSearcher{}
+		structurerToSet = &models.OpenAIStructurer{}
+	}
+
 	return &App{
 		tripsService:       models.NewTripsService(db),
 		expensesService:    models.NewExpensesService(db),
@@ -37,8 +51,8 @@ func NewApp(db *sql.DB, photoDir string) *App {
 		photosService:      models.NewPhotosService(db, photoDir),
 		itinerariesService: models.NewItinerariesService(db),
 		aiService:          models.NewAIServiceService(db),
-		mockWebSearcher:    &models.MockWebSearcher{},
-		mockStructurer:     &models.MockStructurer{},
+		webSearcher:        webSearcherToSet,
+		structurer:         structurerToSet,
 	}
 }
 
@@ -238,12 +252,21 @@ func (a *App) DeleteItineraryById(itineraryId int64) error {
 
 // AI
 func (a *App) GenerateAITripPlan() (int64, error) {
-	data, err := a.aiService.SearchWeb(a.mockWebSearcher, models.TripAIRequest{})
+	var apiKey string
+
+	useRealAI := os.Getenv("USE_REAL_AI") == "true"
+	if useRealAI {
+		apiKey = os.Getenv("OPENAI_API_KEY")
+		if apiKey == "" {
+			return 0, fmt.Errorf("OPENAI_API_KEY not set")
+		}
+	}
+	data, err := a.aiService.SearchWeb(a.webSearcher, models.TripAIRequest{}, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error querying LLM on web search: %v", err)
 	}
 
-	structured, err := a.aiService.StructureWebResult(a.mockStructurer, data)
+	structured, err := a.aiService.StructureWebResult(a.structurer, data, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error structuring web search result: %v", err)
 	}

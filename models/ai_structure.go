@@ -23,4 +23,42 @@ func PrintAITripPlanSchema() {
 	fmt.Println(string(pretty))
 }
 
+func (TripType) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		Enum: []any{
+			TripTypeTravel,
+			TripTypeFestival,
+			TripTypeRoadtrip,
+			TripTypeOther,
+		},
+	}
+}
+
+func (ExpenseCat) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		Enum: []any{
+			ExpenseCatFlight,
+			ExpenseCatHotel,
+			ExpenseCatCar,
+			ExpenseCatFestival,
+			ExpenseCatFood,
+			ExpenseCatActivity,
+			ExpenseCatOther,
+		},
+	}
+}
+
+func (Currency) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		Enum: []any{
+			CurrencyUSD,
+			CurrencyEUR,
+			CurrencyGBP,
+		},
+	}
+}
+
 var AITripPlanSchema = generateSchema[AITripPlan]()

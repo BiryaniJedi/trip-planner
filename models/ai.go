@@ -35,13 +35,13 @@ type WebSearchResult struct {
 // WebSearcher is implemented by anything that can run Pass 1.
 // Concrete type: OpenAIWebSearcher. Mock type: MockWebSearcher.
 type WebSearcher interface {
-	Search(req TripAIRequest) (WebSearchResult, error)
+	Search(req TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error)
 }
 
 // Structurer is implemented by anything that can run Pass 2.
 // Concrete type: OpenAIStructurer. Mock type: MockStructurer.
 type Structurer interface {
-	Structure(research WebSearchResult, req TripAIRequest) (AITripPlan, error)
+	GenerateTripPlan(research WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error)
 }
 
 // ── Request types ──────────────────────────────────────────────
@@ -107,14 +107,36 @@ func NewAIServiceService(database *sql.DB) *AIService {
 	return &AIService{database}
 }
 
-func (as *AIService) SearchWeb(searcher *MockWebSearcher, tripAIInput TripAIRequest) (WebSearchResult, error) {
-	return searcher.Search(tripAIInput)
+func (as *AIService) SearchWeb(searcher WebSearcher, tripAIInput TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
+	if !useRealAI {
+		mockSearcher, ok := searcher.(*MockWebSearcher)
+		if !ok {
+			return WebSearchResult{}, fmt.Errorf("searcher is not a MockWebSearcher, got=%T\n", searcher)
+		}
+		res, err := mockSearcher.Search(tripAIInput, useRealAI, apiKey)
+		if err != nil {
+			return WebSearchResult{}, err
+		}
+		return res, nil
+	}
+
+	// TODO real AI search here
+	return WebSearchResult{}, nil
 }
 
-func (as *AIService) StructureWebResult(structurer *MockStructurer, result WebSearchResult) (AITripPlan, error) {
-	structured, err := structurer.GenerateTripPlan(result)
-	if err != nil {
-		return AITripPlan{}, fmt.Errorf("Error structuring web search result: %v", err)
+func (as *AIService) StructureWebResult(structurer Structurer, result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
+	if !useRealAI {
+		mockStructurer, ok := structurer.(*MockStructurer)
+		if !ok {
+			return AITripPlan{}, fmt.Errorf("structurer is not a MockStructurer, got=%T\n", structurer)
+		}
+		structured, err := mockStructurer.GenerateTripPlan(result, useRealAI, apiKey)
+		if err != nil {
+			return AITripPlan{}, fmt.Errorf("Error structuring web search result: %v", err)
+		}
+		return structured, nil
 	}
-	return structured, nil
+
+	// TODO real structurer here
+	return AITripPlan{}, nil
 }

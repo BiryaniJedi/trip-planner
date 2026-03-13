@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"strings"
+)
+
 // MockTripPlanner is a deterministic, no-network implementation of TripPlannerAI.
 // It is used during development and in tests so you can build the full UI flow
 // without spending API credits or needing an internet connection.
@@ -32,7 +37,10 @@ type MockStructurer struct{}
 //		Notes     []NoteInput      `json:"notes"`
 //		Itinerary []ItineraryInput `json:"itinerary"`
 //	}
-func (m *MockStructurer) GenerateTripPlan(result WebSearchResult) (AITripPlan, error) {
+func (m *MockStructurer) GenerateTripPlan(result WebSearchResult, useRealAI bool, apiKey string) (AITripPlan, error) {
+	if strings.TrimSpace(result.RawText) == "" {
+		return AITripPlan{}, fmt.Errorf("result.RawText cannot be empty")
+	}
 	plans := []AITripPlan{
 		{
 			Trip: TripInput{
@@ -73,7 +81,7 @@ func (m *MockStructurer) GenerateTripPlan(result WebSearchResult) (AITripPlan, e
 				},
 				{
 					Name: "Surprise",
-					Url:  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+					Url:  result.Sources[0],
 				},
 			},
 			Notes: []NoteInput{
