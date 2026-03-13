@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,11 +16,18 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("no .env found")
-	}
+// Injected at build time via -ldflags.
+// Falls back to the env var so `wails dev` still works with .env.
+var openAIKey string
 
+func resolvedAPIKey() string {
+	if openAIKey != "" {
+		return openAIKey
+	}
+	return os.Getenv("OPENAI_API_KEY")
+}
+
+func main() {
 	database, err := db.Init()
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
@@ -33,7 +39,7 @@ func main() {
 	}
 	photoDir := filepath.Join(home, ".trip-planner", "photos")
 
-	app := NewApp(database, photoDir)
+	app := NewApp(database, photoDir, resolvedAPIKey())
 
 	err = wails.Run(&options.App{
 		Title:  "Trip Planner",

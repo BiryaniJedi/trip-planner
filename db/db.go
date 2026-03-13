@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
-	"github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
 	"os"
+	"path/filepath"
 )
 
 // DB is the global database connection
@@ -17,11 +17,22 @@ var schema string
 // Init opens the SQLite database specified in .env and runs migrations.
 // Creates the file if it doesn't exist.
 func Init() (*sql.DB, error) {
-	godotenv.Load()
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("cannot determine home directory: %w", err)
+	}
+
+	dataDir := filepath.Join(home, ".trip-planner")
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, fmt.Errorf("cannot create data directory: %w", err)
+	}
+
+	// Allow override via env var for development, fall back to a fixed location
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "trips.db"
+		dbPath = filepath.Join(dataDir, "app.db")
 	}
+
 	db, err := sql.Open("sqlite", dbPath)
 
 	if err != nil {

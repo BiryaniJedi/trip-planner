@@ -26,10 +26,11 @@ type App struct {
 	aiService          *models.AIService
 	webSearcher        models.WebSearcher
 	structurer         models.Structurer
+	apiKey             string
 }
 
-func NewApp(db *sql.DB, photoDir string) *App {
-	useRealAI := os.Getenv("USE_REAL_AI") == "true"
+func NewApp(db *sql.DB, photoDir string, apiKey string) *App {
+	useRealAI := apiKey != ""
 
 	var (
 		webSearcherToSet models.WebSearcher
@@ -53,6 +54,7 @@ func NewApp(db *sql.DB, photoDir string) *App {
 		aiService:          models.NewAIServiceService(db),
 		webSearcher:        webSearcherToSet,
 		structurer:         structurerToSet,
+		apiKey:             apiKey,
 	}
 }
 
@@ -252,15 +254,13 @@ func (a *App) DeleteItineraryById(itineraryId int64) error {
 
 // AI
 func (a *App) GenerateAITripPlan(req models.TripAIRequest) (int64, error) {
-	var apiKey string
+	useRealAI := a.apiKey != ""
+	apiKey := a.apiKey
 
-	useRealAI := os.Getenv("USE_REAL_AI") == "true"
-	if useRealAI {
-		apiKey = os.Getenv("OPENAI_API_KEY")
-		if apiKey == "" {
-			return 0, fmt.Errorf("OPENAI_API_KEY not set")
-		}
+	if useRealAI && apiKey == "" {
+		return 0, fmt.Errorf("no API key configured")
 	}
+
 	data, err := a.aiService.SearchWeb(a.ctx, a.webSearcher, req, useRealAI, apiKey)
 	if err != nil {
 		return 0, fmt.Errorf("Error querying LLM on web search: %v", err)

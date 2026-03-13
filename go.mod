@@ -5,7 +5,6 @@ go 1.25.0
 require (
 	github.com/google/uuid v1.6.0
 	github.com/invopop/jsonschema v0.13.0
-	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v3 v3.26.0
 	github.com/wailsapp/wails/v2 v2.11.0
 	modernc.org/sqlite v1.46.1
