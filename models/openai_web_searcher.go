@@ -13,8 +13,6 @@ type OpenAIWebSearcher struct{}
 
 func (ow *OpenAIWebSearcher) Search(ctx context.Context, req TripAIRequest, useRealAI bool, apiKey string) (WebSearchResult, error) {
 
-	// return WebSearchResult{}, fmt.Errorf("ERROR: OPENAI search not yet implemented.")
-
 	client := openai.NewClient(option.WithAPIKey(apiKey))
 	const model_4_1_mini = openai.ChatModelGPT4_1Mini
 
