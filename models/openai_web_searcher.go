@@ -20,23 +20,23 @@ func (ow *OpenAIWebSearcher) Search(ctx context.Context, req TripAIRequest, useR
 	var resp *responses.Response
 	resp, err := client.Responses.New(ctx, responses.ResponseNewParams{
 		Model: model_4_1_mini,
-		// Tools: []responses.ToolUnionParam{
-		// 	{
-		// 		OfWebSearch: &responses.WebSearchToolParam{
-		// 			Type: responses.WebSearchToolTypeWebSearch,
-		// 		},
-		// 	},
-		// },
+		Tools: []responses.ToolUnionParam{
+			{
+				OfWebSearch: &responses.WebSearchToolParam{
+					Type: responses.WebSearchToolTypeWebSearch,
+				},
+			},
+		},
 		MaxToolCalls:    openai.Int(1),
 		MaxOutputTokens: openai.Int(4000),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(ow.buildPrompt(req)),
 		},
-		// ToolChoice: responses.ResponseNewParamsToolChoiceUnion{
-		// 	OfHostedTool: &responses.ToolChoiceTypesParam{
-		// 		Type: responses.ToolChoiceTypesTypeWebSearchPreview,
-		// 	},
-		// },
+		ToolChoice: responses.ResponseNewParamsToolChoiceUnion{
+			OfHostedTool: &responses.ToolChoiceTypesParam{
+				Type: responses.ToolChoiceTypesTypeWebSearchPreview,
+			},
+		},
 	})
 	if err != nil {
 		return WebSearchResult{}, fmt.Errorf("Error calling openai web search: %v\n", err)
